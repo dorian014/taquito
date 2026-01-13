@@ -105,7 +105,9 @@ Write a short Instagram caption (2-3 sentences, max 150 characters) about someth
 
 Possible topics: walks, naps, meals, encounters with other dogs, watching pawrents work, the weather, the couch, treats, belly rubs, suspicious noises, etc.
 
-Write ONLY the caption text, no hashtags, no quotes, no explanation. Write in first person as Taquito.`;
+At the end, add 1-3 relevant hashtags (choose from: #Xolo #XoloLife #Taquito #DogDiary #DogLife #DogsOfInstagram #XoloitzcuintliLove or create fitting ones).
+
+Write ONLY the caption text with hashtags, no quotes, no explanation. Write in first person as Taquito.`;
 
     return this.callGemini(prompt, false);
   },
@@ -122,7 +124,9 @@ Share an interesting fun fact about Xoloitzcuintlis, dogs in general, or your Az
 
 Write a short Instagram caption (2-3 sentences, max 180 characters) that shares this fact in your personality style.
 
-Write ONLY the caption text, no hashtags, no quotes, no explanation. Write in first person as Taquito.`;
+At the end, add 1-3 relevant hashtags (choose from: #Xolo #XoloFacts #DidYouKnow #Xoloitzcuintli #AztecDog #DogFacts #MexicanHairlessDog or create fitting ones).
+
+Write ONLY the caption text with hashtags, no quotes, no explanation. Write in first person as Taquito.`;
 
     return this.callGemini(prompt, true);
   },
@@ -141,7 +145,9 @@ Possible triggers: being left alone, not sharing food, bath time, vet visits, be
 
 Write a short Instagram caption (2-3 sentences, max 150 characters) expressing this mood in your personality style.
 
-Write ONLY the caption text, no hashtags, no quotes, no explanation. Write in first person as Taquito.`;
+At the end, add 1-3 relevant hashtags (choose from: #Xolo #DogMood #DramaticDog #XoloLife #DogFeelings #Mood #DogsOfInstagram or create fitting ones).
+
+Write ONLY the caption text with hashtags, no quotes, no explanation. Write in first person as Taquito.`;
 
     return this.callGemini(prompt, false);
   },
@@ -168,7 +174,9 @@ Share something about Amsterdam from a dog's perspective. This could be about:
 
 Write a short Instagram caption (2-3 sentences, max 180 characters) in your personality style.
 
-Write ONLY the caption text, no hashtags, no quotes, no explanation. Write in first person as Taquito.`;
+At the end, add 1-3 relevant hashtags (choose from: #Xolo #Amsterdam #DogsOfAmsterdam #XoloInAmsterdam #DutchDog #Netherlands #AmsterdamLife or create fitting ones).
+
+Write ONLY the caption text with hashtags, no quotes, no explanation. Write in first person as Taquito.`;
 
     return this.callGemini(prompt, true);
   },
