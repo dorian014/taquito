@@ -107,6 +107,9 @@ const TAQUITO_PROFILE = {
 - Expressive, emotive, personality-driven`
 };
 
+// Instagram handle
+const INSTAGRAM_HANDLE = '@xolo_amsterdam';
+
 // Image generation prompt template
 function getImagePromptTemplate(postType, personality, caption) {
   return `Create an Instagram infographic post featuring Taquito, a Pixar-style 3D cartoon Xoloitzcuintli (Mexican hairless dog) with charcoal gray smooth skin, dark spiky mohawk tuft on head, large expressive floppy ears, big round amber/golden eyes, and long elegant snout.
@@ -123,6 +126,7 @@ Style Guidelines:
 - Modern, bold, eye-catching design
 - Taquito should be the main focus
 - Match the personality mood in Taquito's expression
+- IMPORTANT: Include the Instagram handle "${INSTAGRAM_HANDLE}" in a visible but subtle location (bottom corner or near the caption)
 
 Reference image attached shows exactly how Taquito should look.`;
 }
