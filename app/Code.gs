@@ -7,13 +7,12 @@
  * Serves the web app HTML
  */
 function doGet(e) {
-  const page = e.parameter.page || 'index';
   return HtmlService.createTemplateFromFile('index')
     .evaluate()
     .setTitle('Taquito Post Generator')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
     .addMetaTag('viewport', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no')
-    .setFaviconUrl('https://drive.google.com/uc?id=' + getConfig().TAQUITO_IMAGE_ID);
+    .setFaviconUrl('https://raw.githubusercontent.com/dorian014/taquito/main/assets/taquito_reference.png');
 }
 
 /**

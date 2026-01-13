@@ -121,26 +121,67 @@ function getPostTypeColor(postType) {
   return colorMap[postType] || colorMap['diary'];
 }
 
+// Get visual style based on post type
+function getPostTypeStyle(postType) {
+  const styles = {
+    'diary': `DIARY JOURNAL STYLE:
+- Design it like a page from a personal diary or notebook
+- Paper texture background with subtle lines or grid
+- Handwritten-style font for the caption text
+- Include a date stamp in the corner (today's date)
+- Taquito peeking from the side or corner, like he's writing
+- Warm, cozy, personal feeling
+- Add a paw print signature at the bottom (like Taquito signed it)
+- Maybe a coffee stain or ink splatter as decoration`,
+
+    'funfact': `EDUCATIONAL FUN FACT STYLE:
+- Bold "Did You Know?" or "Xolo Fact" banner at the top
+- Clean, modern educational card design
+- Large, readable typography for the fact
+- Taquito as a teacher/professor (maybe with tiny glasses or pointing)
+- Infographic elements like icons or small illustrations
+- Professional but playful layout`,
+
+    'mood': `MEME/REACTION STYLE:
+- Bold, expressive, meme-inspired design
+- Taquito's face/expression is the MAIN focus, large and centered
+- Big, impactful text (top and/or bottom like classic memes)
+- Dramatic lighting or background that matches the emotion
+- High contrast, attention-grabbing
+- The emotion should be instantly readable`,
+
+    'amsterdam': `POSTCARD/TRAVEL STYLE:
+- Vintage postcard or travel poster aesthetic
+- Amsterdam elements in background (canals, bikes, tulips, windmills, Dutch houses)
+- "Greetings from Amsterdam" or postcard-style framing
+- Taquito as a tourist or local guide
+- Stamp or postmark decorations
+- Warm, nostalgic travel vibes`
+  };
+  return styles[postType] || styles['diary'];
+}
+
 // Image generation prompt template
 function getImagePromptTemplate(postType, personality, caption) {
   const accentColor = getPostTypeColor(postType);
+  const visualStyle = getPostTypeStyle(postType);
 
-  return `Create an Instagram infographic post featuring Taquito, a Pixar-style 3D cartoon Xoloitzcuintli (Mexican hairless dog) with charcoal gray smooth skin, dark spiky mohawk tuft on head, large expressive floppy ears, big round amber/golden eyes, and long elegant snout.
+  return `Create an Instagram post featuring Taquito, a Pixar-style 3D cartoon Xoloitzcuintli (Mexican hairless dog) with charcoal gray smooth skin, dark spiky mohawk tuft on head, large expressive floppy ears, big round amber/golden eyes, and long elegant snout.
 
-Post Type: ${postType}
-Personality: ${personality}
-Content: ${caption}
+CHARACTER MOOD: ${personality}
+CAPTION TEXT TO INCLUDE: ${caption}
 
-Style Guidelines:
+${visualStyle}
+
+GENERAL GUIDELINES:
 - Instagram square format (1080x1080)
 - PRIMARY ACCENT COLOR: ${accentColor.name} (${accentColor.hex}) - use this prominently for backgrounds, borders, or highlights
 - Secondary brand colors: Orange #FF5722, Pink #D81B60, Green #00C853, Blue #1E88E5
 - Light background #FAFAFA
-- Include readable text overlay with the caption
-- Modern, bold, eye-catching design with the accent color as the dominant visual element
-- Taquito should be the main focus
-- Match the personality mood in Taquito's expression
-- IMPORTANT: Include the Instagram handle "${INSTAGRAM_HANDLE}" in a visible but subtle location (bottom corner or near the caption)
+- Include the caption text in the design (readable, well-placed)
+- Taquito's expression should match the ${personality} mood
+- Modern, bold, eye-catching design
+- IMPORTANT: Include "${INSTAGRAM_HANDLE}" subtly in a corner
 
-Reference image attached shows exactly how Taquito should look.`;
+Reference image attached shows exactly how Taquito should look - maintain this character design!`;
 }
