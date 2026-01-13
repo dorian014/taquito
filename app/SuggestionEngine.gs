@@ -54,11 +54,11 @@ const SuggestionEngine = {
   /**
    * Generate all 4 suggestions
    */
-  generateAllSuggestions: function(personalityPrompt) {
+  generateAllSuggestions: function(personalityPrompt, topicPrompt) {
     const suggestions = [];
 
     // Generate each type
-    const diaryResult = this.generateDiarySuggestion(personalityPrompt);
+    const diaryResult = this.generateDiarySuggestion(personalityPrompt, topicPrompt);
     if (diaryResult.success) {
       suggestions.push({
         type: POST_TYPES.DIARY,
@@ -66,7 +66,7 @@ const SuggestionEngine = {
       });
     }
 
-    const funFactResult = this.generateFunFactSuggestion(personalityPrompt);
+    const funFactResult = this.generateFunFactSuggestion(personalityPrompt, topicPrompt);
     if (funFactResult.success) {
       suggestions.push({
         type: POST_TYPES.FUNFACT,
@@ -74,7 +74,7 @@ const SuggestionEngine = {
       });
     }
 
-    const moodResult = this.generateMoodSuggestion(personalityPrompt);
+    const moodResult = this.generateMoodSuggestion(personalityPrompt, topicPrompt);
     if (moodResult.success) {
       suggestions.push({
         type: POST_TYPES.MOOD,
@@ -82,7 +82,7 @@ const SuggestionEngine = {
       });
     }
 
-    const amsterdamResult = this.generateAmsterdamSuggestion(personalityPrompt);
+    const amsterdamResult = this.generateAmsterdamSuggestion(personalityPrompt, topicPrompt);
     if (amsterdamResult.success) {
       suggestions.push({
         type: POST_TYPES.AMSTERDAM,
@@ -96,14 +96,14 @@ const SuggestionEngine = {
   /**
    * Generate diary suggestion
    */
-  generateDiarySuggestion: function(personalityPrompt) {
-    const prompt = `You are Taquito, a Xoloitzcuintli (Mexican hairless dog) living in Amsterdam with your pawrents.
+  generateDiarySuggestion: function(personalityPrompt, topicPrompt) {
+    const topicLine = topicPrompt ? `\nTOPIC: Write about ${topicPrompt}\n` : '\nTOPIC: Choose any daily dog life topic (walks, naps, meals, other dogs, pawrents, weather, couch, treats, etc.)\n';
+
+    const prompt = `You are Taquito, a Xoloitzcuintle (Mexican hairless dog) living in Amsterdam with your pawrents.
 
 PERSONALITY: ${personalityPrompt}
-
-Write a short Instagram caption (2-3 sentences, max 150 characters) about something that happened in your day. This is a diary entry about daily dog life.
-
-Possible topics: walks, naps, meals, encounters with other dogs, watching pawrents work, the weather, the couch, treats, belly rubs, suspicious noises, etc.
+${topicLine}
+Write a short Instagram caption (2-3 sentences, max 150 characters) about something that happened in your day. This is a diary entry.
 
 At the end, add 1-3 relevant hashtags based on the caption content.
 
@@ -115,12 +115,14 @@ Write ONLY the caption text with hashtags, no quotes, no explanation. Write in f
   /**
    * Generate fun fact suggestion
    */
-  generateFunFactSuggestion: function(personalityPrompt) {
-    const prompt = `You are Taquito, a Xoloitzcuintli (Mexican hairless dog) living in Amsterdam with your pawrents.
+  generateFunFactSuggestion: function(personalityPrompt, topicPrompt) {
+    const topicLine = topicPrompt ? `\nTOPIC: Relate the fun fact to ${topicPrompt} if possible\n` : '';
+
+    const prompt = `You are Taquito, a Xoloitzcuintle (Mexican hairless dog) living in Amsterdam with your pawrents.
 
 PERSONALITY: ${personalityPrompt}
-
-Share an interesting fun fact about Xoloitzcuintlis, dogs in general, or your Aztec heritage. Make it educational but entertaining.
+${topicLine}
+Share an interesting fun fact about Xoloitzcuintles, dogs in general, or your Aztec heritage. Make it educational but entertaining.
 
 Write a short Instagram caption (2-3 sentences, max 180 characters) that shares this fact in your personality style.
 
@@ -134,14 +136,14 @@ Write ONLY the caption text with hashtags, no quotes, no explanation. Write in f
   /**
    * Generate mood suggestion
    */
-  generateMoodSuggestion: function(personalityPrompt) {
-    const prompt = `You are Taquito, a Xoloitzcuintli (Mexican hairless dog) living in Amsterdam with your pawrents.
+  generateMoodSuggestion: function(personalityPrompt, topicPrompt) {
+    const topicLine = topicPrompt ? `\nTOPIC: Express feelings about ${topicPrompt}\n` : '\nTOPIC: Express feelings about something (being left alone, food, bath time, vet, being ignored, vacuum cleaner, etc.)\n';
+
+    const prompt = `You are Taquito, a Xoloitzcuintle (Mexican hairless dog) living in Amsterdam with your pawrents.
 
 PERSONALITY: ${personalityPrompt}
-
-Express your feelings about something your pawrents did (or didn't do). This is an emotional reaction post.
-
-Possible triggers: being left alone, not sharing food, bath time, vet visits, being woken up, ignored, the vacuum cleaner, closed doors, etc.
+${topicLine}
+Express your feelings about this. This is an emotional reaction post.
 
 Write a short Instagram caption (2-3 sentences, max 150 characters) expressing this mood in your personality style.
 
@@ -155,16 +157,17 @@ Write ONLY the caption text with hashtags, no quotes, no explanation. Write in f
   /**
    * Generate Amsterdam suggestion
    */
-  generateAmsterdamSuggestion: function(personalityPrompt) {
+  generateAmsterdamSuggestion: function(personalityPrompt, topicPrompt) {
     const today = new Date();
     const dateStr = Utilities.formatDate(today, 'Europe/Amsterdam', 'EEEE, MMMM d, yyyy');
+    const topicLine = topicPrompt ? `\nTOPIC: Relate to ${topicPrompt} in Amsterdam context\n` : '';
 
-    const prompt = `You are Taquito, a Xoloitzcuintli (Mexican hairless dog) living in Amsterdam, Netherlands with your pawrents.
+    const prompt = `You are Taquito, a Xoloitzcuintle (Mexican hairless dog) living in Amsterdam, Netherlands with your pawrents.
 
 Today is ${dateStr}.
 
 PERSONALITY: ${personalityPrompt}
-
+${topicLine}
 Share something about Amsterdam from a dog's perspective. This could be about:
 - The current weather and how it affects walkies
 - A dog-friendly spot in Amsterdam

@@ -63,6 +63,19 @@
           <label for="custom-prompt">Describe Taquito's vibe:</label>
           <textarea id="custom-prompt" placeholder="e.g., Sleepy and cuddly, wants all the blankets..."></textarea>
         </div>
+
+        <div class="section-divider">
+          <span>📝 What's the topic?</span>
+        </div>
+
+        <div class="topic-grid" id="topic-grid">
+          <!-- Populated by JS -->
+        </div>
+        <div id="custom-topic-container" class="custom-prompt-container hidden">
+          <label for="custom-topic">Describe the topic:</label>
+          <textarea id="custom-topic" placeholder="e.g., The neighbor's cat that keeps staring at me..."></textarea>
+        </div>
+
         <button class="btn btn-primary btn-block" id="generate-suggestions-btn" onclick="generateSuggestions()" disabled>
           ✨ Generate Ideas
         </button>

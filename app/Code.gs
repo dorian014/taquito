@@ -72,9 +72,16 @@ function getPersonalities() {
 }
 
 /**
- * Generate suggestions based on personality
+ * Get all topics
  */
-function generateSuggestions(personalityId, customPrompt) {
+function getTopics() {
+  return DEFAULT_TOPICS;
+}
+
+/**
+ * Generate suggestions based on personality and topic
+ */
+function generateSuggestions(personalityId, customPrompt, topicId, customTopic) {
   try {
     const personality = SheetsDB.getPersonalityById(personalityId);
     if (!personality) {
@@ -82,7 +89,17 @@ function generateSuggestions(personalityId, customPrompt) {
     }
 
     const promptModifier = personalityId === 'custom' ? customPrompt : personality.prompt;
-    const suggestions = SuggestionEngine.generateAllSuggestions(promptModifier);
+
+    // Get topic prompt
+    let topicPrompt = '';
+    if (topicId && topicId !== 'random') {
+      const topic = DEFAULT_TOPICS.find(t => t.id === topicId);
+      if (topic) {
+        topicPrompt = topicId === 'custom' ? customTopic : topic.prompt;
+      }
+    }
+
+    const suggestions = SuggestionEngine.generateAllSuggestions(promptModifier, topicPrompt);
 
     return { success: true, suggestions: suggestions };
   } catch (error) {

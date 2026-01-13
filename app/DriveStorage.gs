@@ -24,13 +24,17 @@ const DriveStorage = {
       const file = folder.createFile(imageBlob);
       file.setName(filename);
 
-      // Make file publicly viewable
-      file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+      // Try to make file publicly viewable (may fail due to org restrictions)
+      try {
+        file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+      } catch (shareError) {
+        console.log('Could not set sharing (org restriction?): ' + shareError.message);
+      }
 
       return {
         success: true,
         imageId: file.getId(),
-        imageUrl: 'https://drive.google.com/uc?id=' + file.getId(),
+        imageUrl: 'https://lh3.googleusercontent.com/d/' + file.getId(),
         downloadUrl: 'https://drive.google.com/uc?export=download&id=' + file.getId()
       };
     } catch (error) {
@@ -50,7 +54,7 @@ const DriveStorage = {
    * Get view URL for an image
    */
   getViewUrl: function(imageId) {
-    return 'https://drive.google.com/uc?id=' + imageId;
+    return 'https://lh3.googleusercontent.com/d/' + imageId;
   },
 
   /**
@@ -102,7 +106,7 @@ const DriveStorage = {
           images.push({
             id: file.getId(),
             name: file.getName(),
-            url: 'https://drive.google.com/uc?id=' + file.getId(),
+            url: 'https://lh3.googleusercontent.com/d/' + file.getId(),
             createdAt: file.getDateCreated()
           });
         }

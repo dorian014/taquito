@@ -4,8 +4,8 @@
  */
 
 // API Endpoints
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
-const NANO_BANANA_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent';
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+const NANO_BANANA_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent';
 
 // Get API keys and IDs from Script Properties
 function getConfig() {
@@ -36,6 +36,21 @@ const POST_TYPES = {
   MOOD: { id: 'mood', name: 'Mood', emoji: '😤', color: COLORS.ACCENT },
   AMSTERDAM: { id: 'amsterdam', name: 'Amsterdam', emoji: '🌷', color: COLORS.SUCCESS }
 };
+
+// Default Topics
+const DEFAULT_TOPICS = [
+  { id: 'random', name: 'Surprise Me!', emoji: '🎲', prompt: '' },
+  { id: 'walks', name: 'Walkies', emoji: '🦮', prompt: 'going for walks, the park, sniffing things, other dogs on the street' },
+  { id: 'naps', name: 'Nap Time', emoji: '😴', prompt: 'sleeping, naps, the couch, blankets, being cozy' },
+  { id: 'food', name: 'Food & Treats', emoji: '🦴', prompt: 'food, treats, snacks, begging, meal time, human food' },
+  { id: 'weather', name: 'Weather', emoji: '🌦️', prompt: 'the weather in Amsterdam, rain, sun, cold, wind' },
+  { id: 'pawrents', name: 'Pawrents', emoji: '👨‍👩‍👦', prompt: 'the humans, pawrents, what they do, working from home' },
+  { id: 'alone', name: 'Home Alone', emoji: '🏠', prompt: 'being left alone, separation, waiting for pawrents to return' },
+  { id: 'bathtime', name: 'Bath Time', emoji: '🛁', prompt: 'bath time, getting clean, water, being wet' },
+  { id: 'vet', name: 'Vet Visit', emoji: '🏥', prompt: 'the vet, doctor visits, checkups, shots' },
+  { id: 'couch', name: 'Couch Life', emoji: '🛋️', prompt: 'the couch, furniture, claiming spots, being comfy' },
+  { id: 'custom', name: 'Custom Topic', emoji: '✏️', prompt: '', isCustom: true }
+];
 
 // Default Personalities
 const DEFAULT_PERSONALITIES = [
@@ -93,11 +108,11 @@ const DEFAULT_PERSONALITIES = [
 // Taquito Character Profile
 const TAQUITO_PROFILE = {
   name: 'Taquito',
-  breed: 'Xoloitzcuintli (Mexican hairless dog)',
+  breed: 'Xoloitzcuintle (Mexican hairless dog)',
   gender: 'Male',
   location: 'Amsterdam, Netherlands',
   heritage: 'Dutch + Mexican',
-  description: `Taquito: Pixar-style 3D cartoon Xoloitzcuintli (Mexican hairless dog).
+  description: `Taquito: Pixar-style 3D cartoon Xoloitzcuintle (Mexican hairless dog).
 - Charcoal gray smooth skin
 - Dark spiky mohawk tuft on head
 - Large expressive floppy ears
@@ -166,7 +181,16 @@ function getImagePromptTemplate(postType, personality, caption) {
   const accentColor = getPostTypeColor(postType);
   const visualStyle = getPostTypeStyle(postType);
 
-  return `Create an Instagram post featuring Taquito, a Pixar-style 3D cartoon Xoloitzcuintli (Mexican hairless dog) with charcoal gray smooth skin, dark spiky mohawk tuft on head, large expressive floppy ears, big round amber/golden eyes, and long elegant snout.
+  return `Create an Instagram post featuring Taquito, matching the style and character design from the attached reference image.
+
+CRITICAL - Taquito must have:
+- HAIRLESS body and face - NO fur anywhere except the mohawk
+- Dark spiky MOHAWK tuft of hair ONLY on top of head (his signature look - very important!)
+- Charcoal gray smooth skin (completely hairless, no fur on face or body)
+- Large expressive floppy ears
+- Big round amber/golden eyes
+- Long elegant snout
+- Xoloitzcuintle (Mexican hairless dog) - he is HAIRLESS
 
 CHARACTER MOOD: ${personality}
 CAPTION TEXT TO INCLUDE: ${caption}
@@ -183,5 +207,5 @@ GENERAL GUIDELINES:
 - Modern, bold, eye-catching design
 - IMPORTANT: Include "${INSTAGRAM_HANDLE}" subtly in a corner
 
-Reference image attached shows exactly how Taquito should look - maintain this character design!`;
+REFERENCE IMAGE: Copy this character design exactly - especially the MOHAWK!`;
 }

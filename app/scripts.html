@@ -3,11 +3,14 @@
   let state = {
     selectedPersonality: null,
     customPrompt: '',
+    selectedTopic: null,
+    customTopic: '',
     suggestions: [],
     selectedSuggestion: null,
     currentCaption: '',
     generatedImage: null,
-    personalities: []
+    personalities: [],
+    topics: []
   };
 
   // Colors for post types
@@ -31,14 +34,26 @@
     loadPersonalities();
   });
 
-  // Load personalities from backend
+  // Load personalities and topics from backend
   function loadPersonalities() {
     showLoading('Loading...');
     google.script.run
       .withSuccessHandler(function(personalities) {
         state.personalities = personalities;
         renderPersonalityGrid();
-        hideLoading();
+        // Load topics after personalities
+        google.script.run
+          .withSuccessHandler(function(topics) {
+            state.topics = topics;
+            renderTopicGrid();
+            hideLoading();
+          })
+          .withFailureHandler(function(error) {
+            hideLoading();
+            showToast('Failed to load topics');
+            console.error(error);
+          })
+          .getTopics();
       })
       .withFailureHandler(function(error) {
         hideLoading();
@@ -83,17 +98,66 @@
       customContainer.classList.add('hidden');
     }
 
-    // Enable generate button
-    document.getElementById('generate-suggestions-btn').disabled = false;
+    updateGenerateButton();
+  }
+
+  // Render topic selection grid
+  function renderTopicGrid() {
+    const grid = document.getElementById('topic-grid');
+    grid.innerHTML = '';
+
+    state.topics.forEach(function(t) {
+      const btn = document.createElement('button');
+      btn.className = 'topic-btn';
+      btn.dataset.id = t.id;
+      btn.innerHTML = `
+        <span class="emoji">${t.emoji}</span>
+        <span class="name">${t.name}</span>
+      `;
+      btn.onclick = function() { selectTopic(t.id); };
+      grid.appendChild(btn);
+    });
+  }
+
+  // Select a topic
+  function selectTopic(id) {
+    state.selectedTopic = id;
+
+    // Update UI
+    document.querySelectorAll('.topic-btn').forEach(function(btn) {
+      btn.classList.toggle('selected', btn.dataset.id === id);
+    });
+
+    // Show/hide custom topic input
+    const customContainer = document.getElementById('custom-topic-container');
+    if (id === 'custom') {
+      customContainer.classList.remove('hidden');
+    } else {
+      customContainer.classList.add('hidden');
+    }
+
+    updateGenerateButton();
+  }
+
+  // Update generate button state
+  function updateGenerateButton() {
+    const btn = document.getElementById('generate-suggestions-btn');
+    btn.disabled = !(state.selectedPersonality && state.selectedTopic);
   }
 
   // Generate suggestions
   function generateSuggestions() {
-    if (!state.selectedPersonality) return;
+    if (!state.selectedPersonality || !state.selectedTopic) return;
 
     const customPrompt = document.getElementById('custom-prompt').value;
     if (state.selectedPersonality === 'custom' && !customPrompt.trim()) {
       showToast('Please describe Taquito\'s vibe');
+      return;
+    }
+
+    const customTopic = document.getElementById('custom-topic').value;
+    if (state.selectedTopic === 'custom' && !customTopic.trim()) {
+      showToast('Please describe the topic');
       return;
     }
 
@@ -116,7 +180,7 @@
         showToast('Error: ' + error.message);
         console.error(error);
       })
-      .generateSuggestions(state.selectedPersonality, customPrompt);
+      .generateSuggestions(state.selectedPersonality, customPrompt, state.selectedTopic, customTopic);
   }
 
   // Render suggestions list
