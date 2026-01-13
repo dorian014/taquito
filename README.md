@@ -18,17 +18,27 @@ Built with Google Apps Script + Gemini AI + Google Sheets/Drive.
 
 ```
 /taquito
-├── Code.gs              # Main entry point, routing
-├── Config.gs            # API keys, constants, colors
-├── SuggestionEngine.gs  # Gemini 2.5 Flash integration
-├── ImageGenerator.gs    # Nano Banana integration
-├── SheetsDB.gs          # Google Sheets operations
-├── DriveStorage.gs      # Google Drive operations
-├── UI.gs                # HTML template handlers
-├── index.html           # Main app shell
-├── styles.html          # CSS (inline)
-└── scripts.html         # JavaScript
+├── /app                 # Copy these to Apps Script
+│   ├── Code.gs          # Main entry point, routing
+│   ├── Config.gs        # API keys, constants, colors
+│   ├── SuggestionEngine.gs  # Gemini 2.5 Flash integration
+│   ├── ImageGenerator.gs    # Nano Banana integration
+│   ├── SheetsDB.gs      # Google Sheets operations
+│   ├── DriveStorage.gs  # Google Drive operations
+│   ├── UI.gs            # HTML template handlers
+│   ├── index.html       # Main app shell
+│   ├── styles.html      # CSS (inline)
+│   └── scripts.html     # JavaScript
+├── /preview             # Local preview (design only)
+│   └── preview.html
+├── /docs
+│   └── TAQUITO_PROJECT_SPEC.md
+├── /assets
+│   └── taquito_reference.png
+└── README.md
 ```
+
+> **Note:** Google Apps Script doesn't support folders. When deploying, copy all files from `/app` to the root of your Apps Script project.
 
 ## Setup Instructions
 

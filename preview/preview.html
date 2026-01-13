@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#FF5722">
+  <title>Taquito - Preview</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #FF5722;
+      --accent: #D81B60;
+      --success: #00C853;
+      --secondary: #1E88E5;
+      --background: #FAFAFA;
+      --text-dark: #212121;
+      --text-light: #757575;
+      --white: #FFFFFF;
+      --shadow: 0 2px 8px rgba(0,0,0,0.1);
+      --shadow-lg: 0 4px 16px rgba(0,0,0,0.15);
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    html, body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--background);
+      color: var(--text-dark);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .header {
+      background: var(--primary);
+      color: var(--white);
+      padding: 16px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow);
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .history-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    .main {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .step { display: none; }
+    .step.active { display: block; animation: fadeIn 0.3s ease; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .step-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .back-btn {
+      background: none;
+      border: none;
+      color: var(--primary);
+      font-size: 16px;
+      font-weight: 600;
+      padding: 8px 0;
+      cursor: pointer;
+      margin-bottom: 16px;
+    }
+
+    .personality-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .personality-btn {
+      background: var(--white);
+      border: 2px solid transparent;
+      border-radius: var(--radius);
+      padding: 12px 8px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow);
+    }
+
+    .personality-btn:active { transform: scale(0.95); }
+    .personality-btn.selected {
+      border-color: var(--primary);
+      background: #FFF3E0;
+    }
+
+    .personality-btn .emoji { font-size: 28px; }
+    .personality-btn .name {
+      font-size: 11px;
+      color: var(--text-light);
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 16px 24px;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      min-height: 52px;
+    }
+
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn:active:not(:disabled) { transform: scale(0.98); }
+    .btn-block { width: 100%; }
+    .btn-primary { background: var(--primary); color: var(--white); }
+    .btn-secondary { background: var(--secondary); color: var(--white); }
+    .btn-accent { background: var(--accent); color: var(--white); }
+    .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+
+    .suggestions-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .suggestion-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-left: 4px solid;
+    }
+
+    .suggestion-card:active { transform: scale(0.98); }
+
+    .suggestion-card .type-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .suggestion-card .type-emoji { font-size: 20px; }
+    .suggestion-card .type-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-light);
+    }
+
+    .suggestion-card .suggestion-text {
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--text-dark);
+    }
+
+    .caption-editor {
+      width: 100%;
+      min-height: 150px;
+      padding: 16px;
+      border: 1px solid #E0E0E0;
+      border-radius: var(--radius);
+      font-size: 16px;
+      line-height: 1.5;
+      resize: vertical;
+      margin-bottom: 8px;
+    }
+
+    .char-count {
+      text-align: right;
+      font-size: 12px;
+      color: var(--text-light);
+      margin-bottom: 16px;
+    }
+
+    .post-type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 16px;
+    }
+
+    .preview-container {
+      background: var(--white);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      margin-bottom: 20px;
+    }
+
+    .preview-image {
+      width: 100%;
+      display: block;
+      aspect-ratio: 1;
+      background: linear-gradient(135deg, #FFE0B2 0%, #FFCCBC 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 64px;
+    }
+
+    .caption-preview {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .caption-preview h3 {
+      font-size: 14px;
+      color: var(--text-light);
+      margin-bottom: 8px;
+    }
+
+    .caption-preview p {
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .action-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .action-buttons .btn {
+      padding: 12px 8px;
+      font-size: 14px;
+    }
+
+    /* Navigation tabs for preview */
+    .preview-nav {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .preview-nav button {
+      padding: 8px 16px;
+      border: 1px solid #E0E0E0;
+      background: var(--white);
+      border-radius: 20px;
+      font-size: 13px;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .preview-nav button.active {
+      background: var(--primary);
+      color: var(--white);
+      border-color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-content">
+      <h1 class="logo">Taquito</h1>
+      <button class="history-btn">📚</button>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- Preview Navigation -->
+    <div class="preview-nav">
+      <button class="active" onclick="showStep('personality')">1. Personality</button>
+      <button onclick="showStep('suggestions')">2. Suggestions</button>
+      <button onclick="showStep('edit')">3. Edit</button>
+      <button onclick="showStep('preview')">4. Preview</button>
+    </div>
+
+    <!-- Step 1: Personality Selection -->
+    <section id="step-personality" class="step active">
+      <h2 class="step-title">🎭 How is Taquito feeling today?</h2>
+      <div class="personality-grid">
+        <button class="personality-btn" onclick="selectPersonality(this)">
+          <span class="emoji">😤</span>
+          <span class="name">Dramatic Diva</span>
+        </button>
+        <button class="personality-btn selected" onclick="selectPersonality(this)">
+          <span class="emoji">🥰</span>
+          <span class="name">Sweet & Wholesome</span>
+        </button>
+        <button class="personality-btn" onclick="selectPersonality(this)">
+          <span class="emoji">😏</span>
+          <span class="name">Sassy & Judgy</span>
+        </button>
+        <button class="personality-btn" onclick="selectPersonality(this)">
+          <span class="emoji">🤓</span>
+          <span class="name">Wise & Philosophical</span>
+        </button>
+        <button class="personality-btn" onclick="selectPersonality(this)">
+          <span class="emoji">🤪</span>
+          <span class="name">Chaotic Gremlin</span>
+        </button>
+        <button class="personality-btn" onclick="selectPersonality(this)">
+          <span class="emoji">👑</span>
+          <span class="name">Royal Aztec Prince</span>
+        </button>
+        <button class="personality-btn" onclick="selectPersonality(this)">
+          <span class="emoji">✏️</span>
+          <span class="name">Custom Vibe</span>
+        </button>
+      </div>
+      <button class="btn btn-primary btn-block">Generate Suggestions</button>
+    </section>
+
+    <!-- Step 2: Suggestions -->
+    <section id="step-suggestions" class="step">
+      <button class="back-btn">← Back</button>
+      <h2 class="step-title">📋 Here's what Taquito could post:</h2>
+      <div class="suggestions-list">
+        <div class="suggestion-card" style="border-left-color: #FF5722;">
+          <div class="type-header">
+            <span class="type-emoji">🗓️</span>
+            <span class="type-name">Diary</span>
+          </div>
+          <p class="suggestion-text">Today I supervised my pawrent's work from home. They think they're the boss, but we all know who's really in charge here. 10/10 productive day.</p>
+        </div>
+        <div class="suggestion-card" style="border-left-color: #1E88E5;">
+          <div class="type-header">
+            <span class="type-emoji">🧠</span>
+            <span class="type-name">Fun Fact</span>
+          </div>
+          <p class="suggestion-text">Did you know? We Xolos were considered sacred by the Aztecs. They believed we guided souls to the underworld. Pretty important job if you ask me.</p>
+        </div>
+        <div class="suggestion-card" style="border-left-color: #D81B60;">
+          <div class="type-header">
+            <span class="type-emoji">😤</span>
+            <span class="type-name">Mood</span>
+          </div>
+          <p class="suggestion-text">The audacity of my pawrents eating dinner without sharing. I sat there. I stared. They pretended not to see me. The betrayal is immeasurable.</p>
+        </div>
+        <div class="suggestion-card" style="border-left-color: #00C853;">
+          <div class="type-header">
+            <span class="type-emoji">🌷</span>
+            <span class="type-name">Amsterdam</span>
+          </div>
+          <p class="suggestion-text">Perfect 12°C weather today in Amsterdam. Not too cold for my hairless body, not too warm. Peak walkie conditions achieved.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step 3: Edit -->
+    <section id="step-edit" class="step">
+      <button class="back-btn">← Back</button>
+      <h2 class="step-title">✏️ Edit your post</h2>
+      <div class="post-type-badge" style="background: #D81B60;">😤 Mood</div>
+      <textarea class="caption-editor">The audacity of my pawrents eating dinner without sharing. I sat there. I stared. They pretended not to see me. The betrayal is immeasurable.</textarea>
+      <div class="char-count">142 / 2200</div>
+      <button class="btn btn-accent btn-block">🎨 Generate Infographic</button>
+    </section>
+
+    <!-- Step 4: Preview -->
+    <section id="step-preview" class="step">
+      <button class="back-btn">← Back</button>
+      <h2 class="step-title">🖼️ Your post is ready!</h2>
+      <div class="preview-container">
+        <div class="preview-image">🐕</div>
+      </div>
+      <div class="caption-preview">
+        <h3>Caption:</h3>
+        <p>The audacity of my pawrents eating dinner without sharing. I sat there. I stared. They pretended not to see me. The betrayal is immeasurable.</p>
+      </div>
+      <div class="action-buttons">
+        <button class="btn btn-primary">📥 Download</button>
+        <button class="btn btn-secondary">📋 Copy</button>
+        <button class="btn btn-accent">🔄 Redo</button>
+      </div>
+      <button class="btn btn-outline btn-block">✨ Create Another Post</button>
+    </section>
+  </main>
+
+  <script>
+    function showStep(step) {
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+      document.getElementById('step-' + step).classList.add('active');
+      document.querySelectorAll('.preview-nav button').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+
+    function selectPersonality(btn) {
+      document.querySelectorAll('.personality-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    }
+  </script>
+</body>
+</html>
