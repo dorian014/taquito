@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#FF5722">
-  <title>Taquito - Preview</title>
+  <title>Taquito</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -15,222 +18,483 @@
 
     :root {
       --primary: #FF5722;
+      --primary-dark: #E64A19;
+      --primary-light: #FFCCBC;
       --accent: #D81B60;
+      --accent-light: #F8BBD9;
       --success: #00C853;
+      --success-light: #B9F6CA;
       --secondary: #1E88E5;
-      --background: #FAFAFA;
-      --text-dark: #212121;
-      --text-light: #757575;
-      --white: #FFFFFF;
-      --shadow: 0 2px 8px rgba(0,0,0,0.1);
-      --shadow-lg: 0 4px 16px rgba(0,0,0,0.15);
-      --radius: 12px;
-      --radius-sm: 8px;
+      --secondary-light: #BBDEFB;
+      --background: #FFF8F5;
+      --card-bg: #FFFFFF;
+      --text-dark: #2D2D2D;
+      --text-medium: #666666;
+      --text-light: #999999;
+      --border: #F0E8E4;
+      --shadow-sm: 0 2px 8px rgba(255, 87, 34, 0.08);
+      --shadow-md: 0 4px 20px rgba(255, 87, 34, 0.12);
+      --shadow-lg: 0 8px 32px rgba(255, 87, 34, 0.16);
+      --radius-sm: 12px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --radius-full: 9999px;
     }
 
     html, body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
       background: var(--background);
       color: var(--text-dark);
       min-height: 100vh;
       -webkit-font-smoothing: antialiased;
     }
 
+    /* Header */
     .header {
-      background: var(--primary);
-      color: var(--white);
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      color: white;
       padding: 16px 20px;
       position: sticky;
       top: 0;
       z-index: 100;
-      box-shadow: var(--shadow);
+    }
+
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: -20px;
+      left: 0;
+      right: 0;
+      height: 40px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      border-radius: 0 0 50% 50%;
+      z-index: -1;
     }
 
     .header-content {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      max-width: 600px;
+      max-width: 500px;
       margin: 0 auto;
     }
 
-    .logo {
-      font-size: 24px;
-      font-weight: 700;
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
-    .history-btn {
+    .logo-img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(255,255,255,0.3);
+    }
+
+    .logo-text {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .header-btn {
       background: rgba(255,255,255,0.2);
       border: none;
       width: 44px;
       height: 44px;
       border-radius: 50%;
       cursor: pointer;
-      font-size: 20px;
+      font-size: 18px;
+      backdrop-filter: blur(10px);
+      transition: all 0.2s ease;
     }
 
+    .header-btn:hover {
+      background: rgba(255,255,255,0.3);
+      transform: scale(1.05);
+    }
+
+    /* Main */
     .main {
-      max-width: 600px;
+      max-width: 500px;
       margin: 0 auto;
-      padding: 20px;
+      padding: 30px 20px 40px;
     }
 
-    .step { display: none; }
-    .step.active { display: block; animation: fadeIn 0.3s ease; }
+    /* Preview Nav */
+    .preview-nav {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      padding: 4px;
+      background: var(--card-bg);
+      border-radius: var(--radius-full);
+      box-shadow: var(--shadow-sm);
+    }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
+    .preview-nav button {
+      flex: 1;
+      padding: 10px 12px;
+      border: none;
+      background: transparent;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-medium);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .preview-nav button.active {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      color: white;
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Steps */
+    .step { display: none; }
+    .step.active {
+      display: block;
+      animation: slideIn 0.4s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .step-title {
-      font-size: 20px;
-      font-weight: 600;
-      margin-bottom: 20px;
+    /* Hero Section */
+    .hero {
       text-align: center;
+      margin-bottom: 28px;
     }
 
-    .back-btn {
-      background: none;
-      border: none;
-      color: var(--primary);
-      font-size: 16px;
-      font-weight: 600;
-      padding: 8px 0;
-      cursor: pointer;
-      margin-bottom: 16px;
+    .hero-emoji {
+      font-size: 48px;
+      margin-bottom: 12px;
+      animation: bounce 2s infinite;
     }
 
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .hero-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+    }
+
+    .hero-subtitle {
+      font-size: 15px;
+      color: var(--text-medium);
+      line-height: 1.5;
+    }
+
+    /* Personality Grid */
     .personality-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      margin-bottom: 20px;
+      gap: 10px;
+      margin-bottom: 24px;
     }
 
     .personality-btn {
-      background: var(--white);
-      border: 2px solid transparent;
-      border-radius: var(--radius);
-      padding: 12px 8px;
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px 8px;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       transition: all 0.2s ease;
-      box-shadow: var(--shadow);
+      box-shadow: var(--shadow-sm);
     }
 
-    .personality-btn:active { transform: scale(0.95); }
+    .personality-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .personality-btn:active {
+      transform: scale(0.95);
+    }
+
     .personality-btn.selected {
       border-color: var(--primary);
-      background: #FFF3E0;
+      background: linear-gradient(180deg, #FFF5F2 0%, #FFEBE5 100%);
+      box-shadow: 0 4px 20px rgba(255, 87, 34, 0.25);
     }
 
-    .personality-btn .emoji { font-size: 28px; }
+    .personality-btn .emoji {
+      font-size: 32px;
+      filter: grayscale(0.2);
+      transition: all 0.2s ease;
+    }
+
+    .personality-btn.selected .emoji {
+      filter: grayscale(0);
+      transform: scale(1.1);
+    }
+
     .personality-btn .name {
-      font-size: 11px;
+      font-size: 10px;
+      font-weight: 700;
       color: var(--text-light);
       text-align: center;
-      line-height: 1.2;
+      line-height: 1.3;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
     }
 
+    .personality-btn.selected .name {
+      color: var(--primary);
+    }
+
+    /* Buttons */
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      padding: 16px 24px;
+      gap: 10px;
+      padding: 16px 28px;
       border: none;
-      border-radius: var(--radius);
+      border-radius: var(--radius-full);
+      font-family: inherit;
       font-size: 16px;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
       transition: all 0.2s ease;
-      min-height: 52px;
+      min-height: 56px;
     }
 
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn:active:not(:disabled) { transform: scale(0.98); }
-    .btn-block { width: 100%; }
-    .btn-primary { background: var(--primary); color: var(--white); }
-    .btn-secondary { background: var(--secondary); color: var(--white); }
-    .btn-accent { background: var(--accent); color: var(--white); }
-    .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+    .btn:hover {
+      transform: translateY(-2px);
+    }
 
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-block { width: 100%; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      box-shadow: 0 4px 20px rgba(255, 87, 34, 0.4);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 6px 28px rgba(255, 87, 34, 0.5);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, var(--secondary) 0%, #1565C0 100%);
+      color: white;
+      box-shadow: 0 4px 20px rgba(30, 136, 229, 0.4);
+    }
+
+    .btn-accent {
+      background: linear-gradient(135deg, var(--accent) 0%, #AD1457 100%);
+      color: white;
+      box-shadow: 0 4px 20px rgba(216, 27, 96, 0.4);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, var(--success) 0%, #00A844 100%);
+      color: white;
+      box-shadow: 0 4px 20px rgba(0, 200, 83, 0.4);
+    }
+
+    .btn-outline {
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      color: var(--text-dark);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    /* Back Button */
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: none;
+      border: none;
+      color: var(--primary);
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 8px 0;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+
+    .back-btn:hover {
+      opacity: 0.8;
+    }
+
+    /* Suggestion Cards */
     .suggestions-list {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
     }
 
     .suggestion-card {
-      background: var(--white);
-      border-radius: var(--radius);
-      padding: 16px;
-      box-shadow: var(--shadow);
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 18px;
       cursor: pointer;
       transition: all 0.2s ease;
-      border-left: 4px solid;
+      box-shadow: var(--shadow-sm);
+      border: 2px solid transparent;
+      position: relative;
+      overflow: hidden;
     }
 
-    .suggestion-card:active { transform: scale(0.98); }
+    .suggestion-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 5px;
+    }
+
+    .suggestion-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .suggestion-card:active {
+      transform: scale(0.98);
+    }
+
+    .suggestion-card.type-diary::before { background: var(--primary); }
+    .suggestion-card.type-funfact::before { background: var(--secondary); }
+    .suggestion-card.type-mood::before { background: var(--accent); }
+    .suggestion-card.type-amsterdam::before { background: var(--success); }
 
     .suggestion-card .type-header {
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
+      gap: 10px;
+      margin-bottom: 10px;
     }
 
-    .suggestion-card .type-emoji { font-size: 20px; }
-    .suggestion-card .type-name {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-light);
+    .suggestion-card .type-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
     }
+
+    .suggestion-card.type-diary .type-icon { background: var(--primary-light); }
+    .suggestion-card.type-funfact .type-icon { background: var(--secondary-light); }
+    .suggestion-card.type-mood .type-icon { background: var(--accent-light); }
+    .suggestion-card.type-amsterdam .type-icon { background: var(--success-light); }
+
+    .suggestion-card .type-name {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .suggestion-card.type-diary .type-name { color: var(--primary); }
+    .suggestion-card.type-funfact .type-name { color: var(--secondary); }
+    .suggestion-card.type-mood .type-name { color: var(--accent); }
+    .suggestion-card.type-amsterdam .type-name { color: var(--success); }
 
     .suggestion-card .suggestion-text {
       font-size: 15px;
-      line-height: 1.5;
+      line-height: 1.6;
       color: var(--text-dark);
+    }
+
+    .suggestion-card .tap-hint {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 20px;
+      color: var(--text-light);
+      opacity: 0;
+      transition: all 0.2s ease;
+    }
+
+    .suggestion-card:hover .tap-hint {
+      opacity: 1;
+      right: 12px;
+    }
+
+    /* Edit Section */
+    .post-type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: var(--radius-full);
+      font-size: 13px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .caption-editor {
       width: 100%;
-      min-height: 150px;
-      padding: 16px;
-      border: 1px solid #E0E0E0;
-      border-radius: var(--radius);
+      min-height: 160px;
+      padding: 18px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      font-family: inherit;
       font-size: 16px;
-      line-height: 1.5;
-      resize: vertical;
-      margin-bottom: 8px;
+      line-height: 1.6;
+      resize: none;
+      background: var(--card-bg);
+      transition: all 0.2s ease;
+    }
+
+    .caption-editor:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(255, 87, 34, 0.1);
     }
 
     .char-count {
       text-align: right;
-      font-size: 12px;
-      color: var(--text-light);
-      margin-bottom: 16px;
-    }
-
-    .post-type-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
-      color: var(--white);
-      margin-bottom: 16px;
+      color: var(--text-light);
+      margin: 8px 0 20px;
     }
 
+    /* Preview Section */
     .preview-container {
-      background: var(--white);
-      border-radius: var(--radius);
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
       overflow: hidden;
       box-shadow: var(--shadow-lg);
       margin-bottom: 20px;
@@ -238,197 +502,291 @@
 
     .preview-image {
       width: 100%;
-      display: block;
       aspect-ratio: 1;
-      background: linear-gradient(135deg, #FFE0B2 0%, #FFCCBC 100%);
+      background: linear-gradient(135deg, #FFE0B2 0%, #FFCCBC 50%, #F8BBD9 100%);
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-size: 64px;
+      gap: 12px;
+    }
+
+    .preview-image .placeholder-icon {
+      font-size: 80px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .preview-image .placeholder-text {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
     .caption-preview {
-      background: var(--white);
-      border-radius: var(--radius);
-      padding: 16px;
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 18px;
       margin-bottom: 20px;
-      box-shadow: var(--shadow);
+      box-shadow: var(--shadow-sm);
     }
 
     .caption-preview h3 {
-      font-size: 14px;
+      font-size: 12px;
+      font-weight: 700;
       color: var(--text-light);
-      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
     }
 
     .caption-preview p {
       font-size: 15px;
-      line-height: 1.5;
+      line-height: 1.6;
     }
 
     .action-buttons {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 16px;
+      gap: 10px;
+      margin-bottom: 14px;
     }
 
     .action-buttons .btn {
-      padding: 12px 8px;
-      font-size: 14px;
-    }
-
-    /* Navigation tabs for preview */
-    .preview-nav {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 20px;
-      overflow-x: auto;
-      padding-bottom: 8px;
-    }
-
-    .preview-nav button {
-      padding: 8px 16px;
-      border: 1px solid #E0E0E0;
-      background: var(--white);
-      border-radius: 20px;
+      padding: 14px 10px;
       font-size: 13px;
-      white-space: nowrap;
-      cursor: pointer;
+      min-height: 50px;
     }
 
-    .preview-nav button.active {
-      background: var(--primary);
-      color: var(--white);
-      border-color: var(--primary);
+    /* Decorative Elements */
+    .decoration {
+      position: fixed;
+      pointer-events: none;
+      opacity: 0.03;
+      font-size: 200px;
+      z-index: -1;
+    }
+
+    .decoration.top-right {
+      top: -50px;
+      right: -50px;
+    }
+
+    .decoration.bottom-left {
+      bottom: -50px;
+      left: -50px;
+    }
+
+    /* Footer Branding */
+    .footer-brand {
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+      color: var(--text-light);
+    }
+
+    .footer-brand span {
+      color: var(--primary);
+      font-weight: 700;
     }
   </style>
 </head>
 <body>
+  <!-- Decorative Background -->
+  <div class="decoration top-right">🐕</div>
+  <div class="decoration bottom-left">🌮</div>
+
   <header class="header">
     <div class="header-content">
-      <h1 class="logo">Taquito</h1>
-      <button class="history-btn">📚</button>
+      <div class="logo-container">
+        <img src="../assets/taquito_reference.png" alt="Taquito" class="logo-img">
+        <span class="logo-text">Taquito</span>
+      </div>
+      <button class="header-btn">📚</button>
     </div>
   </header>
 
   <main class="main">
     <!-- Preview Navigation -->
     <div class="preview-nav">
-      <button class="active" onclick="showStep('personality')">1. Personality</button>
-      <button onclick="showStep('suggestions')">2. Suggestions</button>
-      <button onclick="showStep('edit')">3. Edit</button>
-      <button onclick="showStep('preview')">4. Preview</button>
+      <button class="active" onclick="showStep('personality')">Mood</button>
+      <button onclick="showStep('suggestions')">Ideas</button>
+      <button onclick="showStep('edit')">Edit</button>
+      <button onclick="showStep('preview')">Done</button>
     </div>
 
     <!-- Step 1: Personality Selection -->
     <section id="step-personality" class="step active">
-      <h2 class="step-title">🎭 How is Taquito feeling today?</h2>
+      <div class="hero">
+        <div class="hero-emoji">🎭</div>
+        <h1 class="hero-title">How's Taquito feeling?</h1>
+        <p class="hero-subtitle">Pick a mood and let's create something amazing together!</p>
+      </div>
+
       <div class="personality-grid">
         <button class="personality-btn" onclick="selectPersonality(this)">
           <span class="emoji">😤</span>
-          <span class="name">Dramatic Diva</span>
+          <span class="name">Dramatic</span>
         </button>
         <button class="personality-btn selected" onclick="selectPersonality(this)">
           <span class="emoji">🥰</span>
-          <span class="name">Sweet & Wholesome</span>
+          <span class="name">Sweet</span>
         </button>
         <button class="personality-btn" onclick="selectPersonality(this)">
           <span class="emoji">😏</span>
-          <span class="name">Sassy & Judgy</span>
+          <span class="name">Sassy</span>
         </button>
         <button class="personality-btn" onclick="selectPersonality(this)">
           <span class="emoji">🤓</span>
-          <span class="name">Wise & Philosophical</span>
+          <span class="name">Wise</span>
         </button>
         <button class="personality-btn" onclick="selectPersonality(this)">
           <span class="emoji">🤪</span>
-          <span class="name">Chaotic Gremlin</span>
+          <span class="name">Chaotic</span>
         </button>
         <button class="personality-btn" onclick="selectPersonality(this)">
           <span class="emoji">👑</span>
-          <span class="name">Royal Aztec Prince</span>
+          <span class="name">Royal</span>
         </button>
         <button class="personality-btn" onclick="selectPersonality(this)">
           <span class="emoji">✏️</span>
-          <span class="name">Custom Vibe</span>
+          <span class="name">Custom</span>
+        </button>
+        <button class="personality-btn" onclick="selectPersonality(this)">
+          <span class="emoji">🎲</span>
+          <span class="name">Surprise</span>
         </button>
       </div>
-      <button class="btn btn-primary btn-block">Generate Suggestions</button>
+
+      <button class="btn btn-primary btn-block">
+        ✨ Generate Ideas
+      </button>
     </section>
 
     <!-- Step 2: Suggestions -->
     <section id="step-suggestions" class="step">
-      <button class="back-btn">← Back</button>
-      <h2 class="step-title">📋 Here's what Taquito could post:</h2>
+      <button class="back-btn">← Back to moods</button>
+
+      <div class="hero">
+        <div class="hero-emoji">💡</div>
+        <h1 class="hero-title">Pick your favorite!</h1>
+        <p class="hero-subtitle">Tap any card to customize it</p>
+      </div>
+
       <div class="suggestions-list">
-        <div class="suggestion-card" style="border-left-color: #FF5722;">
+        <div class="suggestion-card type-diary" onclick="showStep('edit')">
           <div class="type-header">
-            <span class="type-emoji">🗓️</span>
+            <div class="type-icon">🗓️</div>
             <span class="type-name">Diary</span>
           </div>
           <p class="suggestion-text">Today I supervised my pawrent's work from home. They think they're the boss, but we all know who's really in charge here. 10/10 productive day.</p>
+          <span class="tap-hint">→</span>
         </div>
-        <div class="suggestion-card" style="border-left-color: #1E88E5;">
+
+        <div class="suggestion-card type-funfact" onclick="showStep('edit')">
           <div class="type-header">
-            <span class="type-emoji">🧠</span>
+            <div class="type-icon">🧠</div>
             <span class="type-name">Fun Fact</span>
           </div>
-          <p class="suggestion-text">Did you know? We Xolos were considered sacred by the Aztecs. They believed we guided souls to the underworld. Pretty important job if you ask me.</p>
+          <p class="suggestion-text">Did you know? We Xolos were considered sacred by the Aztecs. They believed we guided souls to the underworld. Pretty important job!</p>
+          <span class="tap-hint">→</span>
         </div>
-        <div class="suggestion-card" style="border-left-color: #D81B60;">
+
+        <div class="suggestion-card type-mood" onclick="showStep('edit')">
           <div class="type-header">
-            <span class="type-emoji">😤</span>
+            <div class="type-icon">😤</div>
             <span class="type-name">Mood</span>
           </div>
-          <p class="suggestion-text">The audacity of my pawrents eating dinner without sharing. I sat there. I stared. They pretended not to see me. The betrayal is immeasurable.</p>
+          <p class="suggestion-text">The audacity of my pawrents eating dinner without sharing. I sat there. I stared. They pretended not to see me. The betrayal!</p>
+          <span class="tap-hint">→</span>
         </div>
-        <div class="suggestion-card" style="border-left-color: #00C853;">
+
+        <div class="suggestion-card type-amsterdam" onclick="showStep('edit')">
           <div class="type-header">
-            <span class="type-emoji">🌷</span>
+            <div class="type-icon">🌷</div>
             <span class="type-name">Amsterdam</span>
           </div>
-          <p class="suggestion-text">Perfect 12°C weather today in Amsterdam. Not too cold for my hairless body, not too warm. Peak walkie conditions achieved.</p>
+          <p class="suggestion-text">Perfect 12°C weather today in Amsterdam. Not too cold for my hairless body, not too warm. Peak walkie conditions achieved!</p>
+          <span class="tap-hint">→</span>
         </div>
       </div>
     </section>
 
     <!-- Step 3: Edit -->
     <section id="step-edit" class="step">
-      <button class="back-btn">← Back</button>
-      <h2 class="step-title">✏️ Edit your post</h2>
-      <div class="post-type-badge" style="background: #D81B60;">😤 Mood</div>
+      <button class="back-btn" onclick="showStep('suggestions')">← Back to ideas</button>
+
+      <div class="hero">
+        <div class="hero-emoji">✏️</div>
+        <h1 class="hero-title">Make it yours!</h1>
+        <p class="hero-subtitle">Edit the text or keep it as is</p>
+      </div>
+
+      <div class="post-type-badge" style="background: linear-gradient(135deg, #D81B60, #AD1457);">😤 Mood</div>
+
       <textarea class="caption-editor">The audacity of my pawrents eating dinner without sharing. I sat there. I stared. They pretended not to see me. The betrayal is immeasurable.</textarea>
       <div class="char-count">142 / 2200</div>
-      <button class="btn btn-accent btn-block">🎨 Generate Infographic</button>
+
+      <button class="btn btn-accent btn-block" onclick="showStep('preview')">
+        🎨 Create Infographic
+      </button>
     </section>
 
     <!-- Step 4: Preview -->
     <section id="step-preview" class="step">
-      <button class="back-btn">← Back</button>
-      <h2 class="step-title">🖼️ Your post is ready!</h2>
-      <div class="preview-container">
-        <div class="preview-image">🐕</div>
+      <button class="back-btn" onclick="showStep('edit')">← Back to edit</button>
+
+      <div class="hero">
+        <div class="hero-emoji">🎉</div>
+        <h1 class="hero-title">Ready to post!</h1>
+        <p class="hero-subtitle">Your masterpiece is complete</p>
       </div>
+
+      <div class="preview-container">
+        <div class="preview-image">
+          <span class="placeholder-icon">🐕</span>
+          <span class="placeholder-text">@xolo_amsterdam</span>
+        </div>
+      </div>
+
       <div class="caption-preview">
-        <h3>Caption:</h3>
+        <h3>Caption</h3>
         <p>The audacity of my pawrents eating dinner without sharing. I sat there. I stared. They pretended not to see me. The betrayal is immeasurable.</p>
       </div>
+
       <div class="action-buttons">
-        <button class="btn btn-primary">📥 Download</button>
+        <button class="btn btn-primary">📥 Save</button>
         <button class="btn btn-secondary">📋 Copy</button>
         <button class="btn btn-accent">🔄 Redo</button>
       </div>
-      <button class="btn btn-outline btn-block">✨ Create Another Post</button>
+
+      <button class="btn btn-outline btn-block" onclick="showStep('personality')">
+        ✨ Create Another
+      </button>
     </section>
+
+    <div class="footer-brand">
+      Made with ❤️ for <span>@xolo_amsterdam</span>
+    </div>
   </main>
 
   <script>
     function showStep(step) {
       document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
       document.getElementById('step-' + step).classList.add('active');
-      document.querySelectorAll('.preview-nav button').forEach(b => b.classList.remove('active'));
-      event.target.classList.add('active');
+
+      const tabs = ['personality', 'suggestions', 'edit', 'preview'];
+      document.querySelectorAll('.preview-nav button').forEach((b, i) => {
+        b.classList.toggle('active', tabs[i] === step);
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function selectPersonality(btn) {

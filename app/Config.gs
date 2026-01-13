@@ -110,8 +110,21 @@ const TAQUITO_PROFILE = {
 // Instagram handle
 const INSTAGRAM_HANDLE = '@xolo_amsterdam';
 
+// Get the primary accent color based on post type
+function getPostTypeColor(postType) {
+  const colorMap = {
+    'diary': { hex: '#FF5722', name: 'Deep Orange' },
+    'funfact': { hex: '#1E88E5', name: 'Royal Blue' },
+    'mood': { hex: '#D81B60', name: 'Magenta Pink' },
+    'amsterdam': { hex: '#00C853', name: 'Vivid Green' }
+  };
+  return colorMap[postType] || colorMap['diary'];
+}
+
 // Image generation prompt template
 function getImagePromptTemplate(postType, personality, caption) {
+  const accentColor = getPostTypeColor(postType);
+
   return `Create an Instagram infographic post featuring Taquito, a Pixar-style 3D cartoon Xoloitzcuintli (Mexican hairless dog) with charcoal gray smooth skin, dark spiky mohawk tuft on head, large expressive floppy ears, big round amber/golden eyes, and long elegant snout.
 
 Post Type: ${postType}
@@ -120,10 +133,11 @@ Content: ${caption}
 
 Style Guidelines:
 - Instagram square format (1080x1080)
-- Use brand colors: Orange #FF5722, Pink #D81B60, Green #00C853, Blue #1E88E5
+- PRIMARY ACCENT COLOR: ${accentColor.name} (${accentColor.hex}) - use this prominently for backgrounds, borders, or highlights
+- Secondary brand colors: Orange #FF5722, Pink #D81B60, Green #00C853, Blue #1E88E5
 - Light background #FAFAFA
 - Include readable text overlay with the caption
-- Modern, bold, eye-catching design
+- Modern, bold, eye-catching design with the accent color as the dominant visual element
 - Taquito should be the main focus
 - Match the personality mood in Taquito's expression
 - IMPORTANT: Include the Instagram handle "${INSTAGRAM_HANDLE}" in a visible but subtle location (bottom corner or near the caption)
