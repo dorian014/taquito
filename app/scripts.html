@@ -18,6 +18,14 @@
     amsterdam: '#00C853'
   };
 
+  // Gradient backgrounds for badges
+  const TYPE_GRADIENTS = {
+    diary: 'linear-gradient(135deg, #FF5722 0%, #E64A19 100%)',
+    funfact: 'linear-gradient(135deg, #1E88E5 0%, #1565C0 100%)',
+    mood: 'linear-gradient(135deg, #D81B60 0%, #AD1457 100%)',
+    amsterdam: 'linear-gradient(135deg, #00C853 0%, #00A844 100%)'
+  };
+
   // Initialize app
   document.addEventListener('DOMContentLoaded', function() {
     loadPersonalities();
@@ -118,11 +126,10 @@
 
     state.suggestions.forEach(function(suggestion, index) {
       const card = document.createElement('div');
-      card.className = 'suggestion-card';
-      card.style.borderLeftColor = TYPE_COLORS[suggestion.type.id];
+      card.className = 'suggestion-card type-' + suggestion.type.id;
       card.innerHTML = `
         <div class="type-header">
-          <span class="type-emoji">${suggestion.type.emoji}</span>
+          <div class="type-icon">${suggestion.type.emoji}</div>
           <span class="type-name">${suggestion.type.name}</span>
         </div>
         <p class="suggestion-text">${suggestion.text}</p>
@@ -139,7 +146,7 @@
 
     // Update edit step
     const badge = document.getElementById('selected-type-badge');
-    badge.style.backgroundColor = TYPE_COLORS[state.selectedSuggestion.type.id];
+    badge.style.background = TYPE_GRADIENTS[state.selectedSuggestion.type.id];
     badge.innerHTML = `${state.selectedSuggestion.type.emoji} ${state.selectedSuggestion.type.name}`;
 
     const editor = document.getElementById('caption-editor');

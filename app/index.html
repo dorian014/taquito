@@ -9,6 +9,11 @@
   <meta name="theme-color" content="#FF5722">
   <title>Taquito</title>
 
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+
   <!-- PWA Manifest (inline) -->
   <link rel="manifest" href="data:application/json,{
     &quot;name&quot;: &quot;Taquito Post Generator&quot;,
@@ -16,20 +21,27 @@
     &quot;description&quot;: &quot;Generate Instagram posts for Taquito the Xolo&quot;,
     &quot;start_url&quot;: &quot;.&quot;,
     &quot;display&quot;: &quot;standalone&quot;,
-    &quot;background_color&quot;: &quot;#FAFAFA&quot;,
+    &quot;background_color&quot;: &quot;#FFF8F5&quot;,
     &quot;theme_color&quot;: &quot;#FF5722&quot;
   }">
 
   <?!= include('styles'); ?>
 </head>
 <body>
+  <!-- Decorative Background -->
+  <div class="decoration top-right">🐕</div>
+  <div class="decoration bottom-left">🌮</div>
+
   <div id="app">
     <!-- Header -->
     <header class="header">
       <div class="header-content">
-        <h1 class="logo">Taquito</h1>
+        <div class="logo-container">
+          <img src="<?= getTaquitoImageUrl() ?>" alt="Taquito" class="logo-img" onerror="this.style.display='none'">
+          <span class="logo-text">Taquito</span>
+        </div>
         <button class="history-btn" onclick="showHistory()">
-          <span class="icon">📚</span>
+          <span>📚</span>
         </button>
       </div>
     </header>
@@ -38,7 +50,12 @@
     <main class="main">
       <!-- Step 1: Personality Selection -->
       <section id="step-personality" class="step active">
-        <h2 class="step-title">🎭 How is Taquito feeling today?</h2>
+        <div class="hero">
+          <div class="hero-emoji">🎭</div>
+          <h1 class="hero-title">How's Taquito feeling?</h1>
+          <p class="hero-subtitle">Pick a mood and let's create something amazing together!</p>
+        </div>
+
         <div class="personality-grid" id="personality-grid">
           <!-- Populated by JS -->
         </div>
@@ -47,14 +64,20 @@
           <textarea id="custom-prompt" placeholder="e.g., Sleepy and cuddly, wants all the blankets..."></textarea>
         </div>
         <button class="btn btn-primary btn-block" id="generate-suggestions-btn" onclick="generateSuggestions()" disabled>
-          Generate Suggestions
+          ✨ Generate Ideas
         </button>
       </section>
 
       <!-- Step 2: Suggestions -->
       <section id="step-suggestions" class="step">
-        <button class="back-btn" onclick="goToStep('personality')">← Back</button>
-        <h2 class="step-title">📋 Here's what Taquito could post:</h2>
+        <button class="back-btn" onclick="goToStep('personality')">← Back to moods</button>
+
+        <div class="hero">
+          <div class="hero-emoji">💡</div>
+          <h1 class="hero-title">Pick your favorite!</h1>
+          <p class="hero-subtitle">Tap any card to customize it</p>
+        </div>
+
         <div class="suggestions-list" id="suggestions-list">
           <!-- Populated by JS -->
         </div>
@@ -62,42 +85,59 @@
 
       <!-- Step 3: Edit & Generate -->
       <section id="step-edit" class="step">
-        <button class="back-btn" onclick="goToStep('suggestions')">← Back</button>
-        <h2 class="step-title">✏️ Edit your post</h2>
+        <button class="back-btn" onclick="goToStep('suggestions')">← Back to ideas</button>
+
+        <div class="hero">
+          <div class="hero-emoji">✏️</div>
+          <h1 class="hero-title">Make it yours!</h1>
+          <p class="hero-subtitle">Edit the text or keep it as is</p>
+        </div>
+
         <div class="post-type-badge" id="selected-type-badge"></div>
         <textarea id="caption-editor" class="caption-editor" placeholder="Your caption..."></textarea>
         <div class="char-count" id="char-count">0 / 2200</div>
         <button class="btn btn-accent btn-block" onclick="generateImage()">
-          🎨 Generate Infographic
+          🎨 Create Infographic
         </button>
       </section>
 
       <!-- Step 4: Preview & Export -->
       <section id="step-preview" class="step">
-        <button class="back-btn" onclick="goToStep('edit')">← Back</button>
-        <h2 class="step-title">🖼️ Your post is ready!</h2>
+        <button class="back-btn" onclick="goToStep('edit')">← Back to edit</button>
+
+        <div class="hero">
+          <div class="hero-emoji">🎉</div>
+          <h1 class="hero-title">Ready to post!</h1>
+          <p class="hero-subtitle">Your masterpiece is complete</p>
+        </div>
+
         <div class="preview-container">
           <img id="preview-image" class="preview-image" src="" alt="Generated image">
         </div>
         <div class="caption-preview">
-          <h3>Caption:</h3>
+          <h3>Caption</h3>
           <p id="final-caption"></p>
         </div>
         <div class="action-buttons">
           <button class="btn btn-primary" onclick="downloadImage()">
-            📥 Download
+            📥 Save
           </button>
           <button class="btn btn-secondary" onclick="copyCaption()">
-            📋 Copy Caption
+            📋 Copy
           </button>
           <button class="btn btn-accent" onclick="regenerateImage()">
-            🔄 Regenerate
+            🔄 Redo
           </button>
         </div>
         <button class="btn btn-outline btn-block" onclick="startOver()">
-          ✨ Create Another Post
+          ✨ Create Another
         </button>
       </section>
+
+      <!-- Footer Branding -->
+      <div class="footer-brand">
+        Made with ❤️ for <span>@xolo_amsterdam</span>
+      </div>
 
       <!-- History Modal -->
       <section id="history-modal" class="modal">

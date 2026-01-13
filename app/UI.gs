@@ -118,3 +118,18 @@ function validateUICaption(caption) {
 function getUIHashtags(postType) {
   return UI.generateHashtags(postType);
 }
+
+/**
+ * Get Taquito reference image URL for logo display
+ */
+function getTaquitoImageUrl() {
+  try {
+    const config = getConfig();
+    if (config.TAQUITO_IMAGE_ID) {
+      return 'https://drive.google.com/thumbnail?id=' + config.TAQUITO_IMAGE_ID + '&sz=w100';
+    }
+    return '';
+  } catch (e) {
+    return '';
+  }
+}
