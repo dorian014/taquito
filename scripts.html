@@ -1,0 +1,381 @@
+<script>
+  // State
+  let state = {
+    selectedPersonality: null,
+    customPrompt: '',
+    suggestions: [],
+    selectedSuggestion: null,
+    currentCaption: '',
+    generatedImage: null,
+    personalities: []
+  };
+
+  // Colors for post types
+  const TYPE_COLORS = {
+    diary: '#FF5722',
+    funfact: '#1E88E5',
+    mood: '#D81B60',
+    amsterdam: '#00C853'
+  };
+
+  // Initialize app
+  document.addEventListener('DOMContentLoaded', function() {
+    loadPersonalities();
+  });
+
+  // Load personalities from backend
+  function loadPersonalities() {
+    showLoading('Loading...');
+    google.script.run
+      .withSuccessHandler(function(personalities) {
+        state.personalities = personalities;
+        renderPersonalityGrid();
+        hideLoading();
+      })
+      .withFailureHandler(function(error) {
+        hideLoading();
+        showToast('Failed to load personalities');
+        console.error(error);
+      })
+      .getPersonalities();
+  }
+
+  // Render personality selection grid
+  function renderPersonalityGrid() {
+    const grid = document.getElementById('personality-grid');
+    grid.innerHTML = '';
+
+    state.personalities.forEach(function(p) {
+      const btn = document.createElement('button');
+      btn.className = 'personality-btn';
+      btn.dataset.id = p.id;
+      btn.innerHTML = `
+        <span class="emoji">${p.emoji}</span>
+        <span class="name">${p.name}</span>
+      `;
+      btn.onclick = function() { selectPersonality(p.id); };
+      grid.appendChild(btn);
+    });
+  }
+
+  // Select a personality
+  function selectPersonality(id) {
+    state.selectedPersonality = id;
+
+    // Update UI
+    document.querySelectorAll('.personality-btn').forEach(function(btn) {
+      btn.classList.toggle('selected', btn.dataset.id === id);
+    });
+
+    // Show/hide custom prompt input
+    const customContainer = document.getElementById('custom-prompt-container');
+    if (id === 'custom') {
+      customContainer.classList.remove('hidden');
+    } else {
+      customContainer.classList.add('hidden');
+    }
+
+    // Enable generate button
+    document.getElementById('generate-suggestions-btn').disabled = false;
+  }
+
+  // Generate suggestions
+  function generateSuggestions() {
+    if (!state.selectedPersonality) return;
+
+    const customPrompt = document.getElementById('custom-prompt').value;
+    if (state.selectedPersonality === 'custom' && !customPrompt.trim()) {
+      showToast('Please describe Taquito\'s vibe');
+      return;
+    }
+
+    showLoading('Taquito is thinking... 🐕');
+    updateLoadingMessage();
+
+    google.script.run
+      .withSuccessHandler(function(result) {
+        hideLoading();
+        if (result.success) {
+          state.suggestions = result.suggestions;
+          renderSuggestions();
+          goToStep('suggestions');
+        } else {
+          showToast('Failed to generate suggestions: ' + result.error);
+        }
+      })
+      .withFailureHandler(function(error) {
+        hideLoading();
+        showToast('Error: ' + error.message);
+        console.error(error);
+      })
+      .generateSuggestions(state.selectedPersonality, customPrompt);
+  }
+
+  // Render suggestions list
+  function renderSuggestions() {
+    const list = document.getElementById('suggestions-list');
+    list.innerHTML = '';
+
+    state.suggestions.forEach(function(suggestion, index) {
+      const card = document.createElement('div');
+      card.className = 'suggestion-card';
+      card.style.borderLeftColor = TYPE_COLORS[suggestion.type.id];
+      card.innerHTML = `
+        <div class="type-header">
+          <span class="type-emoji">${suggestion.type.emoji}</span>
+          <span class="type-name">${suggestion.type.name}</span>
+        </div>
+        <p class="suggestion-text">${suggestion.text}</p>
+      `;
+      card.onclick = function() { selectSuggestion(index); };
+      list.appendChild(card);
+    });
+  }
+
+  // Select a suggestion
+  function selectSuggestion(index) {
+    state.selectedSuggestion = state.suggestions[index];
+    state.currentCaption = state.selectedSuggestion.text;
+
+    // Update edit step
+    const badge = document.getElementById('selected-type-badge');
+    badge.style.backgroundColor = TYPE_COLORS[state.selectedSuggestion.type.id];
+    badge.innerHTML = `${state.selectedSuggestion.type.emoji} ${state.selectedSuggestion.type.name}`;
+
+    const editor = document.getElementById('caption-editor');
+    editor.value = state.currentCaption;
+    updateCharCount();
+
+    goToStep('edit');
+  }
+
+  // Update character count
+  function updateCharCount() {
+    const editor = document.getElementById('caption-editor');
+    const count = document.getElementById('char-count');
+    const len = editor.value.length;
+    count.textContent = `${len} / 2200`;
+    count.style.color = len > 2200 ? '#D81B60' : '#757575';
+  }
+
+  // Setup caption editor
+  document.addEventListener('DOMContentLoaded', function() {
+    const editor = document.getElementById('caption-editor');
+    if (editor) {
+      editor.addEventListener('input', function() {
+        state.currentCaption = editor.value;
+        updateCharCount();
+      });
+    }
+  });
+
+  // Generate image
+  function generateImage() {
+    if (!state.currentCaption.trim()) {
+      showToast('Please enter a caption');
+      return;
+    }
+
+    showLoading('Creating art takes time... 🎨');
+    updateLoadingMessage();
+
+    const interval = setInterval(updateLoadingMessage, 3000);
+
+    google.script.run
+      .withSuccessHandler(function(result) {
+        clearInterval(interval);
+        hideLoading();
+        if (result.success) {
+          state.generatedImage = result;
+          showPreview();
+        } else {
+          showToast('Failed to generate image: ' + result.error);
+        }
+      })
+      .withFailureHandler(function(error) {
+        clearInterval(interval);
+        hideLoading();
+        showToast('Error: ' + error.message);
+        console.error(error);
+      })
+      .generateImage(
+        state.selectedSuggestion.type.id,
+        state.selectedPersonality,
+        state.currentCaption
+      );
+  }
+
+  // Show preview
+  function showPreview() {
+    const img = document.getElementById('preview-image');
+    img.src = state.generatedImage.imageUrl;
+
+    const caption = document.getElementById('final-caption');
+    caption.textContent = state.currentCaption;
+
+    goToStep('preview');
+  }
+
+  // Download image
+  function downloadImage() {
+    if (!state.generatedImage) return;
+
+    const link = document.createElement('a');
+    link.href = state.generatedImage.downloadUrl || state.generatedImage.imageUrl;
+    link.download = 'taquito_post.png';
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    showToast('Download started!');
+
+    // Update status
+    google.script.run.updatePostStatus(state.generatedImage.postId, 'downloaded');
+  }
+
+  // Copy caption
+  function copyCaption() {
+    navigator.clipboard.writeText(state.currentCaption)
+      .then(function() {
+        showToast('Caption copied!');
+      })
+      .catch(function() {
+        // Fallback for older browsers
+        const textarea = document.createElement('textarea');
+        textarea.value = state.currentCaption;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast('Caption copied!');
+      });
+  }
+
+  // Regenerate image
+  function regenerateImage() {
+    generateImage();
+  }
+
+  // Start over
+  function startOver() {
+    state.selectedSuggestion = null;
+    state.currentCaption = '';
+    state.generatedImage = null;
+    goToStep('suggestions');
+  }
+
+  // Navigation
+  function goToStep(step) {
+    document.querySelectorAll('.step').forEach(function(s) {
+      s.classList.remove('active');
+    });
+    document.getElementById('step-' + step).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  // History
+  function showHistory() {
+    showLoading('Loading history...');
+    google.script.run
+      .withSuccessHandler(function(posts) {
+        hideLoading();
+        renderHistory(posts);
+        document.getElementById('history-modal').classList.add('active');
+      })
+      .withFailureHandler(function(error) {
+        hideLoading();
+        showToast('Failed to load history');
+        console.error(error);
+      })
+      .getPostHistory(20);
+  }
+
+  function hideHistory() {
+    document.getElementById('history-modal').classList.remove('active');
+  }
+
+  function renderHistory(posts) {
+    const list = document.getElementById('history-list');
+
+    if (!posts || posts.length === 0) {
+      list.innerHTML = `
+        <div class="empty-state">
+          <div class="emoji">📭</div>
+          <p>No posts yet. Create your first one!</p>
+        </div>
+      `;
+      return;
+    }
+
+    list.innerHTML = posts.map(function(post) {
+      const date = new Date(post.createdAt);
+      const dateStr = date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+      return `
+        <div class="history-item" onclick="openHistoryItem('${post.imageId}')">
+          <img src="${post.imageUrl}" alt="Post">
+          <div class="history-item-info">
+            <div class="date">${dateStr} · ${post.personality}</div>
+            <p class="caption">${post.finalCaption}</p>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function openHistoryItem(imageId) {
+    google.script.run
+      .withSuccessHandler(function(url) {
+        window.open(url, '_blank');
+      })
+      .getImageDownloadUrl(imageId);
+  }
+
+  // Loading
+  function showLoading(message) {
+    document.getElementById('loading-message').textContent = message || 'Loading...';
+    document.getElementById('loading-overlay').classList.remove('hidden');
+  }
+
+  function hideLoading() {
+    document.getElementById('loading-overlay').classList.add('hidden');
+  }
+
+  function updateLoadingMessage() {
+    const messages = [
+      "Taquito is thinking... 🐕",
+      "Consulting the ancient Xolo wisdom... 👑",
+      "Channeling dramatic energy... 😤",
+      "Fetching inspiration from Amsterdam... 🌷",
+      "Preparing the perfect pose... 📸",
+      "Almost there, just one more treat... 🦴",
+      "Creating art takes time... 🎨",
+      "Taquito is working his magic... ✨"
+    ];
+    const msg = messages[Math.floor(Math.random() * messages.length)];
+    document.getElementById('loading-message').textContent = msg;
+  }
+
+  // Toast
+  function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.remove('hidden');
+    setTimeout(function() {
+      toast.classList.add('hidden');
+    }, 3000);
+  }
+
+  // Close modal on backdrop click
+  document.addEventListener('click', function(e) {
+    if (e.target.id === 'history-modal') {
+      hideHistory();
+    }
+  });
+</script>
