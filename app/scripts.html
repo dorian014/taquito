@@ -347,17 +347,19 @@
 
   // History
   function showHistory() {
+    console.log('showHistory called');
     showLoading('Loading history...');
     google.script.run
       .withSuccessHandler(function(posts) {
+        console.log('Success - posts received:', posts);
         hideLoading();
         renderHistory(posts);
         document.getElementById('history-modal').classList.add('active');
       })
       .withFailureHandler(function(error) {
+        console.error('Failure:', error);
         hideLoading();
         showToast('Failed to load history');
-        console.error(error);
       })
       .getPostHistory(20);
   }

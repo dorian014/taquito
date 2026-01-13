@@ -149,7 +149,14 @@ function generateImage(postType, personalityId, caption) {
  * Get post history
  */
 function getPostHistory(limit) {
-  return SheetsDB.getPosts(limit || 20);
+  try {
+    const posts = SheetsDB.getPosts(limit || 20);
+    console.log('getPostHistory returning:', posts ? posts.length : 'null');
+    return posts;
+  } catch (error) {
+    console.error('getPostHistory error:', error);
+    return [];
+  }
 }
 
 /**
@@ -164,4 +171,14 @@ function updatePostStatus(postId, status) {
  */
 function getImageDownloadUrl(imageId) {
   return DriveStorage.getDownloadUrl(imageId);
+}
+
+/**
+ * Debug function - run this to test getPosts
+ */
+function testGetPosts() {
+  const posts = SheetsDB.getPosts(20);
+  console.log('Posts count:', posts.length);
+  console.log('Posts:', JSON.stringify(posts, null, 2));
+  return posts;
 }

@@ -107,7 +107,7 @@ Write a short Instagram caption (2-3 sentences, max 150 characters) about someth
 
 At the end, add 1-3 relevant hashtags based on the caption content.
 
-Write ONLY the caption text with hashtags, no quotes, no explanation. Write in first person as Taquito.`;
+Write ONLY the caption text with hashtags. No quotes, no explanation, no markdown formatting (no asterisks or special characters). Write in first person as Taquito.`;
 
     return this.callGemini(prompt, false);
   },
@@ -128,7 +128,7 @@ Write a short Instagram caption (2-3 sentences, max 180 characters) that shares 
 
 At the end, add 1-3 relevant hashtags based on the caption content.
 
-Write ONLY the caption text with hashtags, no quotes, no explanation. Write in first person as Taquito.`;
+Write ONLY the caption text with hashtags. No quotes, no explanation, no markdown formatting (no asterisks or special characters). Write in first person as Taquito.`;
 
     return this.callGemini(prompt, true);
   },
@@ -149,7 +149,7 @@ Write a short Instagram caption (2-3 sentences, max 150 characters) expressing t
 
 At the end, add 1-3 relevant hashtags based on the caption content.
 
-Write ONLY the caption text with hashtags, no quotes, no explanation. Write in first person as Taquito.`;
+Write ONLY the caption text with hashtags. No quotes, no explanation, no markdown formatting (no asterisks or special characters). Write in first person as Taquito.`;
 
     return this.callGemini(prompt, false);
   },
@@ -179,7 +179,7 @@ Write a short Instagram caption (2-3 sentences, max 180 characters) in your pers
 
 At the end, add 1-3 relevant hashtags based on the caption content.
 
-Write ONLY the caption text with hashtags, no quotes, no explanation. Write in first person as Taquito.`;
+Write ONLY the caption text with hashtags. No quotes, no explanation, no markdown formatting (no asterisks or special characters). Write in first person as Taquito.`;
 
     return this.callGemini(prompt, true);
   },

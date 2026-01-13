@@ -95,9 +95,15 @@ const SheetsDB = {
 
     for (let i = data.length - 1; i >= startIndex; i--) {
       const row = data[i];
+      // Convert Date to ISO string for proper serialization to frontend
+      const createdAtRaw = row[headers.indexOf('created_at')];
+      const createdAt = createdAtRaw instanceof Date
+        ? createdAtRaw.toISOString()
+        : String(createdAtRaw);
+
       posts.push({
         id: row[headers.indexOf('id')],
-        createdAt: row[headers.indexOf('created_at')],
+        createdAt: createdAt,
         personality: row[headers.indexOf('personality')],
         postType: row[headers.indexOf('post_type')],
         suggestion: row[headers.indexOf('suggestion')],
