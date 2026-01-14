@@ -7,8 +7,9 @@ const ImageGenerator = {
   /**
    * Generate infographic image using Nano Banana
    */
-  generateInfographic: function(postType, personalityName, caption) {
+  generateInfographic: function(postType, personalityName, caption, imageStyle) {
     const config = getConfig();
+    imageStyle = imageStyle || 'infographic';
 
     // Get the Taquito reference image
     const refImage = DriveStorage.getTaquitoReferenceImage();
@@ -17,7 +18,7 @@ const ImageGenerator = {
     }
 
     // Build the image prompt
-    const imagePrompt = getImagePromptTemplate(postType, personalityName, caption);
+    const imagePrompt = getImagePromptTemplate(postType, personalityName, caption, imageStyle);
 
     // Prepare API request
     const url = NANO_BANANA_URL + '?key=' + config.GEMINI_API_KEY;

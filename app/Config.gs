@@ -177,35 +177,42 @@ function getPostTypeStyle(postType) {
 }
 
 // Image generation prompt template
-function getImagePromptTemplate(postType, personality, caption) {
+function getImagePromptTemplate(postType, personality, caption, imageStyle) {
   const accentColor = getPostTypeColor(postType);
   const visualStyle = getPostTypeStyle(postType);
+  const isInfographic = imageStyle !== 'image';
 
-  return `Create an Instagram post featuring Taquito, matching the style and character design from the attached reference image.
+  // Text instructions based on style
+  const textInstructions = isInfographic
+    ? `CAPTION TEXT TO INCLUDE: ${caption}\n\n${visualStyle}\n\n- Include the caption text in the design (readable, well-placed)`
+    : `SCENE INSPIRATION: ${caption}\n(Use this to inspire the scene/background - but DO NOT include this text in the image)\n\n- NO TEXT in the image except the Instagram handle`;
 
-CRITICAL - Taquito must have:
+  return `Create an Instagram ${isInfographic ? 'post' : 'image'} featuring Taquito the dog.
+
+CRITICAL - TAQUITO'S APPEARANCE MUST ALWAYS BE EXACTLY LIKE THE REFERENCE IMAGE:
+- Xoloitzcuintle (Mexican hairless dog) - he is HAIRLESS
 - HAIRLESS body and face - NO fur anywhere except the mohawk
 - Dark spiky MOHAWK tuft of hair ONLY on top of head (his signature look - very important!)
 - Charcoal gray smooth skin (completely hairless, no fur on face or body)
 - Large expressive floppy ears
-- Big round amber/golden eyes
+- Big round amber/golden eyes with highlights
 - Long elegant snout
-- Xoloitzcuintle (Mexican hairless dog) - he is HAIRLESS
+- Pixar-style 3D cartoon, cute and appealing
+- COPY THE REFERENCE IMAGE EXACTLY - do not change his appearance!
 
-CHARACTER MOOD: ${personality}
-CAPTION TEXT TO INCLUDE: ${caption}
+MOOD/EXPRESSION ONLY: ${personality}
+(Change Taquito's facial expression and body pose to match this mood, but NEVER change his physical design)
 
-${visualStyle}
+${textInstructions}
 
 GENERAL GUIDELINES:
 - Instagram square format (1080x1080)
-- PRIMARY ACCENT COLOR: ${accentColor.name} (${accentColor.hex}) - use this prominently for backgrounds, borders, or highlights
+- PRIMARY ACCENT COLOR: ${accentColor.name} (${accentColor.hex}) - use for backgrounds, borders, or highlights
 - Secondary brand colors: Orange #FF5722, Pink #D81B60, Green #00C853, Blue #1E88E5
 - Light background #FAFAFA
-- Include the caption text in the design (readable, well-placed)
-- Taquito's expression should match the ${personality} mood
+- Only change Taquito's EXPRESSION and POSE - his body design stays the same
 - Modern, bold, eye-catching design
 - IMPORTANT: Include "${INSTAGRAM_HANDLE}" subtly in a corner
 
-REFERENCE IMAGE: Copy this character design exactly - especially the MOHAWK!`;
+REFERENCE IMAGE: This is Taquito - copy this character design EXACTLY for every image - especially the MOHAWK!`;
 }

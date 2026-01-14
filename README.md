@@ -2,7 +2,7 @@
 
 A mobile-first PWA for generating Instagram infographic posts for Taquito, a Xoloitzcuintle (Mexican hairless dog) living in Amsterdam.
 
-**Live App:** https://dorian014.github.io/taquito/
+[![Launch App](https://img.shields.io/badge/Launch%20App-Taquito-FF5722?style=for-the-badge&logo=pwa&logoColor=white)](https://dorian014.github.io/taquito/)
 
 ## Features
 

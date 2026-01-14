@@ -40,7 +40,8 @@ function handleApiRequest(e) {
         result = generateImage(
           e.parameter.postType,
           e.parameter.personalityId,
-          e.parameter.caption
+          e.parameter.caption,
+          e.parameter.imageStyle || 'infographic'
         );
         break;
 
@@ -157,10 +158,10 @@ function generateSuggestions(personalityId, customPrompt, topicId, customTopic) 
 /**
  * Generate infographic image
  */
-function generateImage(postType, personalityId, caption) {
+function generateImage(postType, personalityId, caption, imageStyle) {
   try {
     const personality = SheetsDB.getPersonalityById(personalityId);
-    const result = ImageGenerator.generateInfographic(postType, personality.name, caption);
+    const result = ImageGenerator.generateInfographic(postType, personality.name, caption, imageStyle);
 
     if (result.success) {
       // Save to Google Sheets
