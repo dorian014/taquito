@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#FF5722">
+  <title>Taquito</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- PWA Manifest (inline) -->
+  <link rel="manifest" href="data:application/json,{
+    &quot;name&quot;: &quot;Taquito Post Generator&quot;,
+    &quot;short_name&quot;: &quot;Taquito&quot;,
+    &quot;description&quot;: &quot;Generate Instagram posts for Taquito the Xolo&quot;,
+    &quot;start_url&quot;: &quot;.&quot;,
+    &quot;display&quot;: &quot;standalone&quot;,
+    &quot;background_color&quot;: &quot;#FFF8F5&quot;,
+    &quot;theme_color&quot;: &quot;#FF5722&quot;,
+    &quot;icons&quot;: [{
+      &quot;src&quot;: &quot;https://raw.githubusercontent.com/dorian014/taquito/main/assets/taquito_reference.png&quot;,
+      &quot;sizes&quot;: &quot;512x512&quot;,
+      &quot;type&quot;: &quot;image/png&quot;,
+      &quot;purpose&quot;: &quot;any maskable&quot;
+    }]
+  }">
+
+  <!-- Apple Touch Icon (for iOS home screen) -->
+  <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/dorian014/taquito/main/assets/taquito_reference.png">
+
+  <style>
+  /* Reset & Base */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  :root {
+    --primary: #FF5722;
+    --primary-dark: #E64A19;
+    --primary-light: #FFCCBC;
+    --accent: #D81B60;
+    --accent-light: #F8BBD9;
+    --success: #00C853;
+    --success-light: #B9F6CA;
+    --secondary: #1E88E5;
+    --secondary-light: #BBDEFB;
+    --background: #FFF8F5;
+    --card-bg: #FFFFFF;
+    --text-dark: #2D2D2D;
+    --text-medium: #666666;
+    --text-light: #999999;
+    --border: #F0E8E4;
+    --shadow-sm: 0 2px 8px rgba(255, 87, 34, 0.08);
+    --shadow-md: 0 4px 20px rgba(255, 87, 34, 0.12);
+    --shadow-lg: 0 8px 32px rgba(255, 87, 34, 0.16);
+    --radius-sm: 12px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --radius-full: 9999px;
+    --safe-top: env(safe-area-inset-top);
+    --safe-bottom: env(safe-area-inset-bottom);
+  }
+
+  html, body {
+    font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--background);
+    color: var(--text-dark);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    padding-top: var(--safe-top);
+    padding-bottom: var(--safe-bottom);
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    color: white;
+    padding: 16px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    border-radius: 0 0 50% 50%;
+    z-index: -1;
+  }
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .logo-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255,255,255,0.3);
+  }
+
+  .logo-text {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+
+  .history-btn {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    backdrop-filter: blur(10px);
+    transition: all 0.2s ease;
+  }
+
+  .history-btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: scale(1.05);
+  }
+
+  .history-btn:active {
+    transform: scale(0.95);
+  }
+
+  /* Main Content */
+  .main {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 30px 20px 40px;
+    padding-bottom: calc(40px + var(--safe-bottom));
+  }
+
+  /* Steps */
+  .step {
+    display: none;
+  }
+
+  .step.active {
+    display: block;
+    animation: slideIn 0.4s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Hero Section */
+  .hero {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+
+  .hero-emoji {
+    font-size: 48px;
+    margin-bottom: 12px;
+    animation: bounce 2s infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .hero-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+  }
+
+  .hero-subtitle {
+    font-size: 15px;
+    color: var(--text-medium);
+    line-height: 1.5;
+  }
+
+  /* Back Button */
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 8px 0;
+    cursor: pointer;
+    margin-bottom: 20px;
+  }
+
+  .back-btn:hover {
+    opacity: 0.8;
+  }
+
+  /* Personality Grid */
+  .personality-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .personality-btn {
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 14px 8px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .personality-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .personality-btn:active {
+    transform: scale(0.95);
+  }
+
+  .personality-btn.selected {
+    border-color: var(--primary);
+    background: linear-gradient(180deg, #FFF5F2 0%, #FFEBE5 100%);
+    box-shadow: 0 4px 20px rgba(255, 87, 34, 0.25);
+  }
+
+  .personality-btn .emoji {
+    font-size: 32px;
+    filter: grayscale(0.2);
+    transition: all 0.2s ease;
+  }
+
+  .personality-btn.selected .emoji {
+    filter: grayscale(0);
+    transform: scale(1.1);
+  }
+
+  .personality-btn .name {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-light);
+    text-align: center;
+    line-height: 1.3;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .personality-btn.selected .name {
+    color: var(--primary);
+  }
+
+  /* Section Divider */
+  .section-divider {
+    text-align: center;
+    margin: 24px 0 20px;
+    position: relative;
+  }
+
+  .section-divider::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .section-divider span {
+    background: var(--background);
+    padding: 0 16px;
+    position: relative;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-medium);
+  }
+
+  /* Topic Grid */
+  .topic-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .topic-btn {
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 10px 6px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .topic-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .topic-btn:active {
+    transform: scale(0.95);
+  }
+
+  .topic-btn.selected {
+    border-color: var(--secondary);
+    background: linear-gradient(180deg, #F0F7FF 0%, #E3F2FD 100%);
+    box-shadow: 0 4px 20px rgba(30, 136, 229, 0.25);
+  }
+
+  .topic-btn .emoji {
+    font-size: 24px;
+    filter: grayscale(0.2);
+    transition: all 0.2s ease;
+  }
+
+  .topic-btn.selected .emoji {
+    filter: grayscale(0);
+    transform: scale(1.1);
+  }
+
+  .topic-btn .name {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--text-light);
+    text-align: center;
+    line-height: 1.2;
+    text-transform: uppercase;
+    letter-spacing: 0.2px;
+  }
+
+  .topic-btn.selected .name {
+    color: var(--secondary);
+  }
+
+  /* Custom Prompt */
+  .custom-prompt-container {
+    margin-bottom: 24px;
+  }
+
+  .custom-prompt-container.hidden {
+    display: none;
+  }
+
+  .custom-prompt-container label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-medium);
+    margin-bottom: 10px;
+  }
+
+  .custom-prompt-container textarea {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    font-family: inherit;
+    font-size: 15px;
+    resize: none;
+    height: 90px;
+    background: var(--card-bg);
+    transition: all 0.2s ease;
+  }
+
+  .custom-prompt-container textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(255, 87, 34, 0.1);
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px 28px;
+    border: none;
+    border-radius: var(--radius-full);
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 56px;
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+  }
+
+  .btn:active {
+    transform: scale(0.98);
+  }
+
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-block {
+    width: 100%;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    box-shadow: 0 4px 20px rgba(255, 87, 34, 0.4);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    box-shadow: 0 6px 28px rgba(255, 87, 34, 0.5);
+  }
+
+  .btn-secondary {
+    background: linear-gradient(135deg, var(--secondary) 0%, #1565C0 100%);
+    color: white;
+    box-shadow: 0 4px 20px rgba(30, 136, 229, 0.4);
+  }
+
+  .btn-accent {
+    background: linear-gradient(135deg, var(--accent) 0%, #AD1457 100%);
+    color: white;
+    box-shadow: 0 4px 20px rgba(216, 27, 96, 0.4);
+  }
+
+  .btn-success {
+    background: linear-gradient(135deg, var(--success) 0%, #00A844 100%);
+    color: white;
+    box-shadow: 0 4px 20px rgba(0, 200, 83, 0.4);
+  }
+
+  .btn-outline {
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    color: var(--text-dark);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .btn-outline:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  /* Suggestions List */
+  .suggestions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .suggestion-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    padding: 18px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .suggestion-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+  }
+
+  .suggestion-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .suggestion-card:active {
+    transform: scale(0.98);
+  }
+
+  .suggestion-card.type-diary::before { background: var(--primary); }
+  .suggestion-card.type-funfact::before { background: var(--secondary); }
+  .suggestion-card.type-mood::before { background: var(--accent); }
+  .suggestion-card.type-amsterdam::before { background: var(--success); }
+
+  .suggestion-card .type-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .suggestion-card .type-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .suggestion-card.type-diary .type-icon { background: var(--primary-light); }
+  .suggestion-card.type-funfact .type-icon { background: var(--secondary-light); }
+  .suggestion-card.type-mood .type-icon { background: var(--accent-light); }
+  .suggestion-card.type-amsterdam .type-icon { background: var(--success-light); }
+
+  .suggestion-card .type-name {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .suggestion-card.type-diary .type-name { color: var(--primary); }
+  .suggestion-card.type-funfact .type-name { color: var(--secondary); }
+  .suggestion-card.type-mood .type-name { color: var(--accent); }
+  .suggestion-card.type-amsterdam .type-name { color: var(--success); }
+
+  .suggestion-card .suggestion-text {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text-dark);
+  }
+
+  /* Caption Editor */
+  .caption-editor {
+    width: 100%;
+    min-height: 160px;
+    padding: 18px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-lg);
+    font-family: inherit;
+    font-size: 16px;
+    line-height: 1.6;
+    resize: none;
+    background: var(--card-bg);
+    transition: all 0.2s ease;
+  }
+
+  .caption-editor:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(255, 87, 34, 0.1);
+  }
+
+  .char-count {
+    text-align: right;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-light);
+    margin: 8px 0 20px;
+  }
+
+  .post-type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: var(--radius-full);
+    font-size: 13px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Preview */
+  .preview-container {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    margin-bottom: 20px;
+  }
+
+  .preview-image {
+    width: 100%;
+    display: block;
+  }
+
+  .caption-preview {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    padding: 18px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .caption-preview h3 {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+
+  .caption-preview p {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .action-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .action-buttons .btn {
+    padding: 14px 10px;
+    font-size: 13px;
+    min-height: 50px;
+  }
+
+  /* History Modal */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 200;
+    padding: 20px;
+    overflow-y: auto;
+  }
+
+  .modal.active {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .modal-content {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    margin-top: 40px;
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .modal-header h2 {
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: var(--text-light);
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  .history-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+  }
+
+  .history-item {
+    display: flex;
+    gap: 12px;
+    padding: 14px;
+    border-radius: var(--radius-md);
+    margin-bottom: 12px;
+    background: var(--background);
+    cursor: pointer;
+  }
+
+  .history-item img {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+  }
+
+  .history-item-info {
+    flex: 1;
+  }
+
+  .history-item-info .date {
+    font-size: 12px;
+    color: var(--text-light);
+    font-weight: 600;
+  }
+
+  .history-item-info .caption {
+    font-size: 14px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-top: 4px;
+  }
+
+  /* Loading Overlay */
+  .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255,248,245,0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 300;
+  }
+
+  .loading-overlay.hidden {
+    display: none;
+  }
+
+  .loading-content {
+    text-align: center;
+  }
+
+  .loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 16px;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .loading-content p {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-dark);
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: calc(20px + var(--safe-bottom));
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--text-dark);
+    color: white;
+    padding: 14px 28px;
+    border-radius: var(--radius-full);
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 400;
+    animation: slideUp 0.3s ease;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .toast.hidden {
+    display: none;
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateX(-50%) translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  }
+
+  /* Utilities */
+  .hidden {
+    display: none !important;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-light);
+  }
+
+  .empty-state .emoji {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+
+  /* Footer Branding */
+  .footer-brand {
+    text-align: center;
+    padding: 24px 20px;
+    font-size: 13px;
+    color: var(--text-light);
+  }
+
+  .footer-brand span {
+    color: var(--primary);
+    font-weight: 700;
+  }
+
+  /* Decorative Elements */
+  .decoration {
+    position: fixed;
+    pointer-events: none;
+    opacity: 0.03;
+    font-size: 200px;
+    z-index: -1;
+  }
+
+  .decoration.top-right {
+    top: -50px;
+    right: -50px;
+  }
+
+  .decoration.bottom-left {
+    bottom: -50px;
+    left: -50px;
+  }
+  </style>
+</head>
+<body>
+  <!-- Decorative Background -->
+  <div class="decoration top-right">🐕</div>
+  <div class="decoration bottom-left">🌮</div>
+
+  <div id="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <div class="logo-container">
+          <img src="https://raw.githubusercontent.com/dorian014/taquito/main/assets/taquito_reference.png" alt="Taquito" class="logo-img" onerror="this.style.display='none'">
+          <span class="logo-text">Taquito</span>
+        </div>
+        <button class="history-btn" onclick="showHistory()">
+          <span>🐾</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+      <!-- Step 1: Personality Selection -->
+      <section id="step-personality" class="step active">
+        <div class="hero">
+          <div class="hero-emoji">🎭</div>
+          <h1 class="hero-title">How's Taquito feeling?</h1>
+          <p class="hero-subtitle">Pick a mood and let's create something amazing together!</p>
+        </div>
+
+        <div class="personality-grid" id="personality-grid">
+          <!-- Populated by JS -->
+        </div>
+        <div id="custom-prompt-container" class="custom-prompt-container hidden">
+          <label for="custom-prompt">Describe Taquito's vibe:</label>
+          <textarea id="custom-prompt" placeholder="e.g., Sleepy and cuddly, wants all the blankets..."></textarea>
+        </div>
+
+        <div class="section-divider">
+          <span>📝 What's the topic?</span>
+        </div>
+
+        <div class="topic-grid" id="topic-grid">
+          <!-- Populated by JS -->
+        </div>
+        <div id="custom-topic-container" class="custom-prompt-container hidden">
+          <label for="custom-topic">Describe the topic:</label>
+          <textarea id="custom-topic" placeholder="e.g., The neighbor's cat that keeps staring at me..."></textarea>
+        </div>
+
+        <button class="btn btn-primary btn-block" id="generate-suggestions-btn" onclick="generateSuggestions()" disabled>
+          ✨ Generate Ideas
+        </button>
+      </section>
+
+      <!-- Step 2: Suggestions -->
+      <section id="step-suggestions" class="step">
+        <button class="back-btn" onclick="goToStep('personality')">← Back to moods</button>
+
+        <div class="hero">
+          <div class="hero-emoji">💡</div>
+          <h1 class="hero-title">Pick your favorite!</h1>
+          <p class="hero-subtitle">Tap any card to customize it</p>
+        </div>
+
+        <div class="suggestions-list" id="suggestions-list">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <!-- Step 3: Edit & Generate -->
+      <section id="step-edit" class="step">
+        <button class="back-btn" onclick="goToStep('suggestions')">← Back to ideas</button>
+
+        <div class="hero">
+          <div class="hero-emoji">✏️</div>
+          <h1 class="hero-title">Make it yours!</h1>
+          <p class="hero-subtitle">Edit the text or keep it as is</p>
+        </div>
+
+        <div class="post-type-badge" id="selected-type-badge"></div>
+        <textarea id="caption-editor" class="caption-editor" placeholder="Your caption..."></textarea>
+        <div class="char-count" id="char-count">0 / 2200</div>
+        <button class="btn btn-accent btn-block" onclick="generateImage()">
+          🎨 Create Infographic
+        </button>
+      </section>
+
+      <!-- Step 4: Preview & Export -->
+      <section id="step-preview" class="step">
+        <button class="back-btn" onclick="goToStep('edit')">← Back to edit</button>
+
+        <div class="hero">
+          <div class="hero-emoji">🎉</div>
+          <h1 class="hero-title">Ready to post!</h1>
+          <p class="hero-subtitle">Your masterpiece is complete</p>
+        </div>
+
+        <div class="preview-container">
+          <img id="preview-image" class="preview-image" src="" alt="Generated image">
+        </div>
+        <div class="caption-preview">
+          <h3>Caption</h3>
+          <p id="final-caption"></p>
+        </div>
+        <div class="action-buttons">
+          <button class="btn btn-primary" onclick="downloadImage()">
+            📥 Save
+          </button>
+          <button class="btn btn-secondary" onclick="copyCaption()">
+            📋 Copy
+          </button>
+          <button class="btn btn-accent" onclick="regenerateImage()">
+            🔄 Redo
+          </button>
+        </div>
+        <button class="btn btn-outline btn-block" onclick="startOver()">
+          ✨ Create Another
+        </button>
+      </section>
+
+      <!-- Footer Branding -->
+      <div class="footer-brand">
+        Made with ❤️ for <span>@xolo_amsterdam</span>
+      </div>
+
+      <!-- History Modal -->
+      <section id="history-modal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>🐾 Post History</h2>
+            <button class="close-btn" onclick="hideHistory()">×</button>
+          </div>
+          <div class="history-list" id="history-list">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Loading Overlay -->
+      <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loading-content">
+          <div class="loading-spinner"></div>
+          <p id="loading-message">Loading...</p>
+        </div>
+      </div>
+
+      <!-- Toast Notification -->
+      <div id="toast" class="toast hidden"></div>
+    </main>
+  </div>
+
+  <script>
+  // ============================================
+  // CONFIGURATION - Update this URL after deploying Apps Script
+  // ============================================
+  const API_URL = 'https://script.google.com/macros/s/AKfycbzepcpSw9b-ZyIVBOKOCY7ARD_IGNvXscaUziI1O0zzRDpSGXZ4akQkrBMNwiO2Fw65/exec';
+
+  // Default data (fallback if API fails)
+  const DEFAULT_PERSONALITIES = [
+    { id: 'dramatic', name: 'Dramatic Diva', emoji: '😤', prompt: 'Everything is a catastrophe. Gasps, sighs, existential crisis over small things.', isCustom: false },
+    { id: 'sweet', name: 'Sweet & Wholesome', emoji: '🥰', prompt: 'Grateful, loving, sees the best in pawrents. Soft and warm tone.', isCustom: false },
+    { id: 'sassy', name: 'Sassy & Judgy', emoji: '😏', prompt: 'Side-eye energy. Judges humans, other dogs, pigeons. Unbothered king.', isCustom: false },
+    { id: 'wise', name: 'Wise & Philosophical', emoji: '🤓', prompt: 'Deep thoughts about life, naps, the meaning of treats.', isCustom: false },
+    { id: 'chaotic', name: 'Chaotic Gremlin', emoji: '🤪', prompt: 'Unhinged energy. Zoomies. Chaos. No thoughts just vibes.', isCustom: false },
+    { id: 'royal', name: 'Royal Aztec Prince', emoji: '👑', prompt: 'Regal, dignified. References ancient Xolo heritage. Expects to be served.', isCustom: false },
+    { id: 'custom', name: 'Custom Vibe', emoji: '✏️', prompt: '', isCustom: true }
+  ];
+
+  const DEFAULT_TOPICS = [
+    { id: 'random', name: 'Surprise Me!', emoji: '🎲', prompt: '' },
+    { id: 'walks', name: 'Walkies', emoji: '🦮', prompt: 'going for walks, the park, sniffing things' },
+    { id: 'naps', name: 'Nap Time', emoji: '😴', prompt: 'sleeping, naps, the couch, blankets' },
+    { id: 'food', name: 'Food & Treats', emoji: '🦴', prompt: 'food, treats, snacks, begging, meal time' },
+    { id: 'weather', name: 'Weather', emoji: '🌦️', prompt: 'the weather in Amsterdam, rain, sun, cold' },
+    { id: 'pawrents', name: 'Pawrents', emoji: '👨‍👩‍👦', prompt: 'the humans, pawrents, working from home' },
+    { id: 'alone', name: 'Home Alone', emoji: '🏠', prompt: 'being left alone, waiting for pawrents' },
+    { id: 'bathtime', name: 'Bath Time', emoji: '🛁', prompt: 'bath time, getting clean, water' },
+    { id: 'vet', name: 'Vet Visit', emoji: '🏥', prompt: 'the vet, doctor visits, checkups' },
+    { id: 'couch', name: 'Couch Life', emoji: '🛋️', prompt: 'the couch, furniture, claiming spots' },
+    { id: 'custom', name: 'Custom Topic', emoji: '✏️', prompt: '', isCustom: true }
+  ];
+
+  // State
+  let state = {
+    selectedPersonality: null,
+    customPrompt: '',
+    selectedTopic: null,
+    customTopic: '',
+    suggestions: [],
+    selectedSuggestion: null,
+    currentCaption: '',
+    generatedImage: null,
+    personalities: DEFAULT_PERSONALITIES,
+    topics: DEFAULT_TOPICS
+  };
+
+  // Colors for post types
+  const TYPE_GRADIENTS = {
+    diary: 'linear-gradient(135deg, #FF5722 0%, #E64A19 100%)',
+    funfact: 'linear-gradient(135deg, #1E88E5 0%, #1565C0 100%)',
+    mood: 'linear-gradient(135deg, #D81B60 0%, #AD1457 100%)',
+    amsterdam: 'linear-gradient(135deg, #00C853 0%, #00A844 100%)'
+  };
+
+  // ============================================
+  // API HELPER
+  // ============================================
+  async function callAPI(action, params = {}) {
+    const url = new URL(API_URL);
+    url.searchParams.set('action', action);
+    Object.keys(params).forEach(key => {
+      url.searchParams.set(key, params[key]);
+    });
+
+    try {
+      const response = await fetch(url.toString());
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('API Error:', error);
+      throw error;
+    }
+  }
+
+  // ============================================
+  // INITIALIZATION
+  // ============================================
+  document.addEventListener('DOMContentLoaded', function() {
+    loadData();
+    setupCaptionEditor();
+  });
+
+  async function loadData() {
+    showLoading('Loading...');
+
+    try {
+      // Load personalities from API
+      const personalitiesData = await callAPI('getPersonalities');
+      if (personalitiesData && personalitiesData.length > 0) {
+        state.personalities = personalitiesData;
+      }
+    } catch (error) {
+      console.log('Using default personalities');
+    }
+
+    try {
+      // Load topics from API
+      const topicsData = await callAPI('getTopics');
+      if (topicsData && topicsData.length > 0) {
+        state.topics = topicsData;
+      }
+    } catch (error) {
+      console.log('Using default topics');
+    }
+
+    renderPersonalityGrid();
+    renderTopicGrid();
+    hideLoading();
+  }
+
+  // ============================================
+  // RENDER FUNCTIONS
+  // ============================================
+  function renderPersonalityGrid() {
+    const grid = document.getElementById('personality-grid');
+    grid.innerHTML = '';
+
+    state.personalities.forEach(function(p) {
+      const btn = document.createElement('button');
+      btn.className = 'personality-btn';
+      btn.dataset.id = p.id;
+      btn.innerHTML = `
+        <span class="emoji">${p.emoji}</span>
+        <span class="name">${p.name}</span>
+      `;
+      btn.onclick = function() { selectPersonality(p.id); };
+      grid.appendChild(btn);
+    });
+  }
+
+  function renderTopicGrid() {
+    const grid = document.getElementById('topic-grid');
+    grid.innerHTML = '';
+
+    state.topics.forEach(function(t) {
+      const btn = document.createElement('button');
+      btn.className = 'topic-btn';
+      btn.dataset.id = t.id;
+      btn.innerHTML = `
+        <span class="emoji">${t.emoji}</span>
+        <span class="name">${t.name}</span>
+      `;
+      btn.onclick = function() { selectTopic(t.id); };
+      grid.appendChild(btn);
+    });
+  }
+
+  function renderSuggestions() {
+    const list = document.getElementById('suggestions-list');
+    list.innerHTML = '';
+
+    state.suggestions.forEach(function(suggestion, index) {
+      const card = document.createElement('div');
+      card.className = 'suggestion-card type-' + suggestion.type.id;
+      card.innerHTML = `
+        <div class="type-header">
+          <div class="type-icon">${suggestion.type.emoji}</div>
+          <span class="type-name">${suggestion.type.name}</span>
+        </div>
+        <p class="suggestion-text">${suggestion.text}</p>
+      `;
+      card.onclick = function() { selectSuggestion(index); };
+      list.appendChild(card);
+    });
+  }
+
+  function renderHistory(posts) {
+    const list = document.getElementById('history-list');
+
+    if (!posts || posts.length === 0) {
+      list.innerHTML = `
+        <div class="empty-state">
+          <div class="emoji">📭</div>
+          <p>No posts yet. Create your first one!</p>
+        </div>
+      `;
+      return;
+    }
+
+    list.innerHTML = posts.map(function(post) {
+      const date = new Date(post.createdAt);
+      const dateStr = date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+      return `
+        <div class="history-item" onclick="openHistoryItem('${post.imageId}')">
+          <img src="${post.imageUrl}" alt="Post">
+          <div class="history-item-info">
+            <div class="date">${dateStr} · ${post.personality}</div>
+            <p class="caption">${post.finalCaption}</p>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ============================================
+  // SELECTION HANDLERS
+  // ============================================
+  function selectPersonality(id) {
+    state.selectedPersonality = id;
+
+    document.querySelectorAll('.personality-btn').forEach(function(btn) {
+      btn.classList.toggle('selected', btn.dataset.id === id);
+    });
+
+    const customContainer = document.getElementById('custom-prompt-container');
+    if (id === 'custom') {
+      customContainer.classList.remove('hidden');
+    } else {
+      customContainer.classList.add('hidden');
+    }
+
+    updateGenerateButton();
+  }
+
+  function selectTopic(id) {
+    state.selectedTopic = id;
+
+    document.querySelectorAll('.topic-btn').forEach(function(btn) {
+      btn.classList.toggle('selected', btn.dataset.id === id);
+    });
+
+    const customContainer = document.getElementById('custom-topic-container');
+    if (id === 'custom') {
+      customContainer.classList.remove('hidden');
+    } else {
+      customContainer.classList.add('hidden');
+    }
+
+    updateGenerateButton();
+  }
+
+  function selectSuggestion(index) {
+    state.selectedSuggestion = state.suggestions[index];
+    state.currentCaption = state.selectedSuggestion.text;
+
+    const badge = document.getElementById('selected-type-badge');
+    badge.style.background = TYPE_GRADIENTS[state.selectedSuggestion.type.id];
+    badge.innerHTML = `${state.selectedSuggestion.type.emoji} ${state.selectedSuggestion.type.name}`;
+
+    const editor = document.getElementById('caption-editor');
+    editor.value = state.currentCaption;
+    updateCharCount();
+
+    goToStep('edit');
+  }
+
+  function updateGenerateButton() {
+    const btn = document.getElementById('generate-suggestions-btn');
+    btn.disabled = !(state.selectedPersonality && state.selectedTopic);
+  }
+
+  // ============================================
+  // MAIN ACTIONS
+  // ============================================
+  async function generateSuggestions() {
+    if (!state.selectedPersonality || !state.selectedTopic) return;
+
+    const customPrompt = document.getElementById('custom-prompt').value;
+    if (state.selectedPersonality === 'custom' && !customPrompt.trim()) {
+      showToast('Please describe Taquito\'s vibe');
+      return;
+    }
+
+    const customTopic = document.getElementById('custom-topic').value;
+    if (state.selectedTopic === 'custom' && !customTopic.trim()) {
+      showToast('Please describe the topic');
+      return;
+    }
+
+    showLoading('Taquito is thinking... 🐕');
+    const interval = setInterval(updateLoadingMessage, 3000);
+
+    try {
+      const result = await callAPI('generateSuggestions', {
+        personalityId: state.selectedPersonality,
+        customPrompt: customPrompt,
+        topicId: state.selectedTopic,
+        customTopic: customTopic
+      });
+
+      clearInterval(interval);
+      hideLoading();
+
+      if (result.success) {
+        state.suggestions = result.suggestions;
+        renderSuggestions();
+        goToStep('suggestions');
+      } else {
+        showToast('Failed to generate suggestions: ' + result.error);
+      }
+    } catch (error) {
+      clearInterval(interval);
+      hideLoading();
+      showToast('Error: ' + error.message);
+      console.error(error);
+    }
+  }
+
+  async function generateImage() {
+    if (!state.currentCaption.trim()) {
+      showToast('Please enter a caption');
+      return;
+    }
+
+    showLoading('Creating art takes time... 🎨');
+    const interval = setInterval(updateLoadingMessage, 3000);
+
+    try {
+      const result = await callAPI('generateImage', {
+        postType: state.selectedSuggestion.type.id,
+        personalityId: state.selectedPersonality,
+        caption: state.currentCaption
+      });
+
+      clearInterval(interval);
+      hideLoading();
+
+      if (result.success) {
+        state.generatedImage = result;
+        showPreview();
+      } else {
+        showToast('Failed to generate image: ' + result.error);
+      }
+    } catch (error) {
+      clearInterval(interval);
+      hideLoading();
+      showToast('Error: ' + error.message);
+      console.error(error);
+    }
+  }
+
+  function showPreview() {
+    const img = document.getElementById('preview-image');
+    img.src = state.generatedImage.imageUrl;
+
+    const caption = document.getElementById('final-caption');
+    caption.textContent = state.currentCaption;
+
+    goToStep('preview');
+  }
+
+  function downloadImage() {
+    if (!state.generatedImage) return;
+
+    const link = document.createElement('a');
+    link.href = state.generatedImage.downloadUrl || state.generatedImage.imageUrl;
+    link.download = 'taquito_post.png';
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    showToast('Download started!');
+
+    // Update status in background
+    callAPI('updatePostStatus', {
+      postId: state.generatedImage.postId,
+      status: 'downloaded'
+    }).catch(console.error);
+  }
+
+  function copyCaption() {
+    navigator.clipboard.writeText(state.currentCaption)
+      .then(function() {
+        showToast('Caption copied!');
+      })
+      .catch(function() {
+        const textarea = document.createElement('textarea');
+        textarea.value = state.currentCaption;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast('Caption copied!');
+      });
+  }
+
+  function regenerateImage() {
+    generateImage();
+  }
+
+  function startOver() {
+    state.selectedSuggestion = null;
+    state.currentCaption = '';
+    state.generatedImage = null;
+    goToStep('suggestions');
+  }
+
+  // ============================================
+  // HISTORY
+  // ============================================
+  async function showHistory() {
+    showLoading('Loading history...');
+
+    try {
+      const posts = await callAPI('getPostHistory', { limit: 20 });
+      hideLoading();
+      renderHistory(posts);
+      document.getElementById('history-modal').classList.add('active');
+    } catch (error) {
+      hideLoading();
+      showToast('Failed to load history');
+      console.error(error);
+    }
+  }
+
+  function hideHistory() {
+    document.getElementById('history-modal').classList.remove('active');
+  }
+
+  async function openHistoryItem(imageId) {
+    try {
+      const url = await callAPI('getImageDownloadUrl', { imageId: imageId });
+      window.open(url, '_blank');
+    } catch (error) {
+      showToast('Failed to open image');
+    }
+  }
+
+  // ============================================
+  // NAVIGATION
+  // ============================================
+  function goToStep(step) {
+    document.querySelectorAll('.step').forEach(function(s) {
+      s.classList.remove('active');
+    });
+    document.getElementById('step-' + step).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  // ============================================
+  // UTILITIES
+  // ============================================
+  function setupCaptionEditor() {
+    const editor = document.getElementById('caption-editor');
+    if (editor) {
+      editor.addEventListener('input', function() {
+        state.currentCaption = editor.value;
+        updateCharCount();
+      });
+    }
+  }
+
+  function updateCharCount() {
+    const editor = document.getElementById('caption-editor');
+    const count = document.getElementById('char-count');
+    const len = editor.value.length;
+    count.textContent = `${len} / 2200`;
+    count.style.color = len > 2200 ? '#D81B60' : '#757575';
+  }
+
+  function showLoading(message) {
+    document.getElementById('loading-message').textContent = message || 'Loading...';
+    document.getElementById('loading-overlay').classList.remove('hidden');
+  }
+
+  function hideLoading() {
+    document.getElementById('loading-overlay').classList.add('hidden');
+  }
+
+  function updateLoadingMessage() {
+    const messages = [
+      "Taquito is thinking... 🐕",
+      "Consulting the ancient Xolo wisdom... 👑",
+      "Channeling dramatic energy... 😤",
+      "Fetching inspiration from Amsterdam... 🌷",
+      "Preparing the perfect pose... 📸",
+      "Almost there, just one more treat... 🦴",
+      "Creating art takes time... 🎨",
+      "Taquito is working his magic... ✨"
+    ];
+    const msg = messages[Math.floor(Math.random() * messages.length)];
+    document.getElementById('loading-message').textContent = msg;
+  }
+
+  function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.remove('hidden');
+    setTimeout(function() {
+      toast.classList.add('hidden');
+    }, 3000);
+  }
+
+  // Close modal on backdrop click
+  document.addEventListener('click', function(e) {
+    if (e.target.id === 'history-modal') {
+      hideHistory();
+    }
+  });
+  </script>
+</body>
+</html>

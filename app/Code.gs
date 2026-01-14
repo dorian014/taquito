@@ -4,15 +4,82 @@
  */
 
 /**
- * Serves the web app HTML
+ * Serves the web app HTML or handles API requests
  */
 function doGet(e) {
+  // Check if this is an API request
+  const action = e.parameter.action;
+
+  if (action) {
+    // Handle API request
+    return handleApiRequest(e);
+  }
+
+  // Serve HTML
   return HtmlService.createTemplateFromFile('index')
     .evaluate()
     .setTitle('Taquito Post Generator')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
     .addMetaTag('viewport', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no')
     .setFaviconUrl('https://raw.githubusercontent.com/dorian014/taquito/main/assets/taquito_reference.png');
+}
+
+/**
+ * Handle API requests from GitHub Pages frontend
+ */
+function handleApiRequest(e) {
+  const action = e.parameter.action;
+  let result;
+
+  try {
+    switch (action) {
+      case 'getPersonalities':
+        result = getPersonalities();
+        break;
+
+      case 'getTopics':
+        result = getTopics();
+        break;
+
+      case 'generateSuggestions':
+        result = generateSuggestions(
+          e.parameter.personalityId,
+          e.parameter.customPrompt || '',
+          e.parameter.topicId,
+          e.parameter.customTopic || ''
+        );
+        break;
+
+      case 'generateImage':
+        result = generateImage(
+          e.parameter.postType,
+          e.parameter.personalityId,
+          e.parameter.caption
+        );
+        break;
+
+      case 'getPostHistory':
+        result = getPostHistory(parseInt(e.parameter.limit) || 20);
+        break;
+
+      case 'updatePostStatus':
+        result = updatePostStatus(e.parameter.postId, e.parameter.status);
+        break;
+
+      case 'getImageDownloadUrl':
+        result = getImageDownloadUrl(e.parameter.imageId);
+        break;
+
+      default:
+        result = { error: 'Unknown action: ' + action };
+    }
+  } catch (error) {
+    result = { error: error.message };
+  }
+
+  // Return JSON response with CORS headers
+  return ContentService.createTextOutput(JSON.stringify(result))
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
 /**
