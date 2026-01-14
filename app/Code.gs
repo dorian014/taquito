@@ -1,27 +1,13 @@
 /**
  * Taquito Instagram Post Generator
- * Main Entry Point and Routing
+ * API Backend for GitHub Pages Frontend
  */
 
 /**
- * Serves the web app HTML or handles API requests
+ * Handle all API requests
  */
 function doGet(e) {
-  // Check if this is an API request
-  const action = e.parameter.action;
-
-  if (action) {
-    // Handle API request
-    return handleApiRequest(e);
-  }
-
-  // Serve HTML
-  return HtmlService.createTemplateFromFile('index')
-    .evaluate()
-    .setTitle('Taquito Post Generator')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no')
-    .setFaviconUrl('https://raw.githubusercontent.com/dorian014/taquito/main/assets/taquito_reference.png');
+  return handleApiRequest(e);
 }
 
 /**
@@ -80,13 +66,6 @@ function handleApiRequest(e) {
   // Return JSON response with CORS headers
   return ContentService.createTextOutput(JSON.stringify(result))
     .setMimeType(ContentService.MimeType.JSON);
-}
-
-/**
- * Include HTML files (for modular templates)
- */
-function include(filename) {
-  return HtmlService.createHtmlOutputFromFile(filename).getContent();
 }
 
 /**
